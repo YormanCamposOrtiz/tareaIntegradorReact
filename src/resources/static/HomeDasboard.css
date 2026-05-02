@@ -1,0 +1,85 @@
+/* Contenedor Principal */
+.admin-content {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center; /* Centro Vertical */
+  align-items: center;     /* Centro Horizontal */
+  
+  /* Restamos la altura del header para que el centro sea real */
+  min-height: calc(100vh - 70px); 
+  width: 100%;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.welcome-text {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.welcome-text h2 {
+  font-size: 2.2rem;
+  color: #1c1917;
+  font-weight: 800;
+}
+
+
+
+/* Grid de Botones */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 25px;
+  
+  /* Ajustamos el max-width para que el 2x2 sea armonioso */
+  max-width: 600px; 
+  width: 100%;
+  
+  /* Quitamos cualquier margen que pueda empujar a los lados */
+  margin: 0; 
+}
+
+.module-btn {
+  background: var(--secondary-orange);
+  border: 1px solid #e7e7e4;
+  border-radius: 30px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.module-btn:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary-orange);
+  box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.1);
+}
+
+.module-emoji {
+  font-size: 4rem;
+}
+
+.module-btn h3 {
+  color: var(--bg-soft);
+  font-size: 1.4rem;
+  font-weight: 880;
+  margin: 0;
+}
+
+
+.module-btn {
+  /* Sube el 40px si quieres que el botón sea más alto */
+  padding: 40px 80px; 
+}
+
+@media (max-width: 600px) {
+  .module-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
