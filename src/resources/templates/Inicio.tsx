@@ -93,7 +93,7 @@ return (
     <div className="header-center">
       <Link to="/" className="flex items-center gap-2 no-underline">
         <Heart className="w-8 h-8 text-white fill-white" />
-        <span className="brand-title text-white">SaludPlus</span>
+        <span className="brand-title text-white">MediExpress</span>
       </Link>
     </div>
     
@@ -208,7 +208,7 @@ return (
 <section className="benefits-section">
   <div className="container mx-auto">
     <h3 className="text-4xl font-extrabold mb-12 text-center text-gray-900 main-title">
-      ¿Por qué SaludPlus?
+      ¿Por qué MediExpress?
     </h3>
     
     {/* Contenedor con la nueva clase grid */}

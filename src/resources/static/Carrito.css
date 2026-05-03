@@ -1,0 +1,144 @@
+/* Contenedor principal con el degradado de fondo */
+.carrito-container {
+  background: linear-gradient(to bottom, #fffaf5, #ffffff);
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+/* Título principal */
+.carrito-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #1a202c;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* La tarjeta blanca principal */
+.carrito-card {
+  background: white;
+  border-radius: 40px; /* Bordes muy redondeados como en la imagen */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* El cuadro naranja del icono */
+.item-icon-box {
+  width: 100px;
+  height: 100px;
+  background-color: #ffedd5; /* Naranja muy claro */
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.item-icon-box svg {
+  color: #f97316; /* Naranja principal */
+  width: 50px;
+  height: 50px;
+}
+
+/* Detalles del producto */
+.item-info h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.item-info p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Precios y botones laterales */
+.item-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f97316;
+}
+
+.btn-delete {
+  color: #ef4444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.2s;
+}
+
+.btn-delete:hover {
+  transform: scale(1.1);
+}
+
+/* Sección de totales */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.summary-label {
+  color: #4b5563;
+  font-size: 1.2rem;
+}
+
+.summary-value {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.summary-free {
+  color: #10b981; /* Verde para el "GRATIS" */
+  font-weight: 700;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 2px solid #f3f4f6;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.total-label {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.total-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #f97316;
+}
+
+/* Botón de pago inferior */
+.btn-payment {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 24px auto 0;
+  background-color: #f97316;
+  color: white;
+  padding: 20px;
+  border-radius: 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+  transition: background 0.3s;
+}
+
+.btn-payment:hover {
+  background-color: #ea580c;
+}

@@ -69,7 +69,7 @@ return (
           <div className="header-center">
             <Link to="/" className="flex items-center gap-2">
               <Heart className="w-8 h-8 text-white fill-white" />
-              <span className="brand-title text-white">SaludPlus</span>
+              <span className="brand-title text-white">MediExpress</span>
             </Link>
           </div>
           <div className="header-right"><div className="w-7"></div></div>
@@ -85,8 +85,8 @@ return (
             <Heart />
           </div>
 
-          {/* 2. TÍTULOS (SaludPlus y Panel) */}
-          <h1>SaludPlus</h1>
+          {/* 2. TÍTULOS (MediExpress y Panel) */}
+          <h1>MediExpress</h1>
           <p className="login-subtitle">Panel de Administración</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">

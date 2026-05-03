@@ -1,0 +1,127 @@
+/* Contenedor principal */
+.perfil-container {
+  background: linear-gradient(to bottom, #fffaf5, #ffffff);
+  min-height: 100vh;
+}
+
+/* La tarjeta blanca */
+.perfil-card {
+  background: white;
+  border-radius: 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+  overflow: hidden; /* Para que el banner no se salga de las esquinas redondeadas */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Sección superior con degradado naranja */
+.perfil-banner {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  padding: 50px 20px;
+  text-align: center;
+  color: white;
+}
+
+.user-avatar-container {
+  width: 90px;
+  height: 90px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.user-name {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.user-email {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Opciones del menú */
+.perfil-options {
+  padding: 30px;
+}
+
+.perfil-option-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: #fffaf5;
+  border-radius: 25px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.perfil-option-item:hover {
+  background: #ffedd5;
+  transform: translateX(10px);
+}
+
+.option-icon-box {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.option-icon-box svg {
+  color: #f97316;
+  width: 30px;
+  height: 30px;
+}
+
+.option-text h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.option-text p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.option-arrow {
+  margin-left: auto;
+  font-size: 1.5rem;
+  color: #f97316;
+  font-weight: bold;
+}
+
+/* Botón de Logout */
+.btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  background: white;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  padding: 20px;
+  border-radius: 25px;
+  margin-top: 30px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: #fef2f2;
+  transform: scale(0.98);
+}

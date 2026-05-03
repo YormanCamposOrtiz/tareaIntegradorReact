@@ -30,7 +30,7 @@ export function DashboardHome() {
 
         <div className="header-brand">
         <Heart className="w-8 h-8 text-white fill-white" />
-        <span className="brand-title text-white">SaludPlus</span>
+        <span className="brand-title text-white">MediExpress</span>
         <span className="admin-clock">{hora}</span>
         </div>
 
