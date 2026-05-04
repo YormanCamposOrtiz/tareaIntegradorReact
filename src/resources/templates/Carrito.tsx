@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import { Home, Heart, ShoppingBag, Trash2, Shield, User } from "lucide-react";
 import axios from "axios";
 
-// Importamos tus estilos existentes y el nuevo del carrito
+// Importación de tus estilos
 import "../static/Header.css";
 import "../static/Footer.css";
 import "../static/Global.css";
 import "../static/Carrito.css"; 
+
 interface CartItem {
   id: number;
   nombre: string;
@@ -44,7 +45,7 @@ export function Carrito() {
             </Link>
           </div>
 
-          <div className="header-center flex items-center gap-2 no-underline">
+          <div className="header-center flex items-center gap-2">
             <Heart className="w-8 h-8 text-white fill-white" />
             <span className="brand-title text-white">MediExpress</span>
           </div>
@@ -57,65 +58,47 @@ export function Carrito() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12">
-        <h1 className="carrito-title">Mi Carrito</h1>
-
-        <div className="max-w-4xl mx-auto">
-          {/* Tarjeta Blanca Principal (como en image_e09a23.png) */}
-          <div className="carrito-card">
-            {items.length > 0 ? (
-              items.map((item) => (
-                <div key={item.id} className="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100 last:border-b-0 last:mb-0 last:pb-0">
-                  {/* Cuadrado naranja del icono */}
-                  <div className="item-icon-box">
-                    <ShoppingBag />
-                  </div>
-                  
-                  <div className="item-info flex-1">
-                    <h3>{item.nombre}</h3>
-                    <p>Cantidad: {item.cantidad}</p>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="item-price">${(item.precio * item.cantidad).toFixed(2)}</div>
-                    <button className="btn-delete" title="Eliminar">
-                      <Trash2 className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-              ))
+      {/* Título Principal */}
+      <h1 className="carrito-title">Mi Carrito</h1>
+      <main className="cart-main-container">      
+        <div className="cart-layout">
+          {/* COLUMNA IZQUIERDA */}
+          <div className="cart-left-column">
+            {items.length === 0 ? (
+              <div className="cart-empty-section">
+                <ShoppingBag size={48} />
+                <p className="cart-empty-text">Tu carrito está vacío.</p>
+                <Link to="/" className="btn-go-shop">Ir a comprar</Link>
+              </div>
             ) : (
-              <div className="text-center py-10">
-                <p className="text-gray-500 text-xl">Tu carrito está vacío.</p>
-                <Link to="/" className="text-orange-500 font-bold hover:underline">Ir a comprar</Link>
+              <div className="cart-items-list">
+                {/* Aquí va tu mapeo de productos */}
               </div>
             )}
-
-            {/* Resumen Final de Totales */}
-            <div className="mt-10">
+          </div>
+      
+          {/* COLUMNA DERECHA */}
+          <aside className="cart-right-column">
+            <div className="carrito-summary-card">
+              <h2 className="summary-title">Resumen de Compra</h2>
               <div className="summary-row">
-                <span className="summary-label">Subtotal:</span>
-                <span className="summary-value">${subtotal.toFixed(2)}</span>
+                <span>Subtotal:</span>
+                <span>S/ {subtotal.toFixed(2)}</span>
               </div>
-              <div className="summary-row">
-                <span className="summary-label">Envío:</span>
-                <span className="summary-free">GRATIS</span>
-              </div>
+              <div className="divider"></div>
               <div className="total-row">
                 <span className="total-label">Total:</span>
-                <span className="total-value">${subtotal.toFixed(2)}</span>
+                <span className="total-value">S/ {subtotal.toFixed(2)}</span>
               </div>
+              <button className="btn-payment">
+                PEDIR POR WHATSAPP <i className="fa-brands fa-whatsapp"></i>
+              </button>
             </div>
-          </div>
-
-          {/* Botón Naranja Inferior */}
-          <Link to="/pago" className="btn-payment">
-            Proceder al Pago
-          </Link>
+          </aside>
         </div>
-      </main><br></br>
+      </main>
 
-      <footer className="bg-gray-900 text-white py-12 mt-20 text-center">
+      <footer className="bg-gray-900 text-white py-8 mt-20 text-center">
         <p className="opacity-70">© 2026 MediExpress - Cuidando de ti cada día.</p>
       </footer>
     </div>

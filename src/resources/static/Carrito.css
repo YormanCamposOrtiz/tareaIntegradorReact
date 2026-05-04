@@ -1,144 +1,109 @@
-/* Contenedor principal con el degradado de fondo */
-.carrito-container {
-  background: linear-gradient(to bottom, #fffaf5, #ffffff);
-  min-height: 100vh;
-  padding-bottom: 50px;
-}
-
-/* Título principal */
+/* 1. Título principal con fuente cursiva */
 .carrito-title {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #1a202c;
+  font-family: 'Lobster', cursive;
+  font-size: 3.5rem;
   text-align: center;
-  margin-bottom: 2rem;
+  margin: 40px 0;
+  color: #000;
 }
 
-/* La tarjeta blanca principal */
-.carrito-card {
-  background: white;
-  border-radius: 40px; /* Bordes muy redondeados como en la imagen */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  max-width: 800px;
-  margin: 0 auto;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* El cuadro naranja del icono */
-.item-icon-box {
-  width: 100px;
-  height: 100px;
-  background-color: #ffedd5; /* Naranja muy claro */
-  border-radius: 20px;
+/* 2. Contenedor de las dos columnas */
+.cart-layout {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 30px;
+  padding: 20px 30px;
+  align-items: flex-start; /* Evita que las tarjetas se estiren */
 }
 
-.item-icon-box svg {
-  color: #f97316; /* Naranja principal */
+/* 3. Proporciones de las columnas */
+.cart-left-column { 
+  flex: 2; 
+}
+
+.cart-right-column { 
+  flex: 1; 
+  min-width: 350px;
+}
+
+/* 4. Cuadro celeste de "Carrito Vacío" */
+.cart-empty-section {
+  background-color: #dcf5fa;
+  border-radius: 12px;
+  padding: 60px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.cart-empty-section svg {
+  color: #134e4a;
   width: 50px;
   height: 50px;
 }
 
-/* Detalles del producto */
-.item-info h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 4px;
-}
-
-.item-info p {
-  color: #6b7280;
+.cart-empty-text {
+  color: #0891b2;
+  font-weight: 600;
   font-size: 1.1rem;
 }
 
-/* Precios y botones laterales */
-.item-price {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #f97316;
+/* 5. Tarjeta de Resumen (Derecha) */
+.carrito-summary-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border: 1px solid #f3f4f6;
+  position: sticky; /* Se queda fija al hacer scroll */
+  top: 100px;
 }
 
-.btn-delete {
-  color: #ef4444;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: transform 0.2s;
-}
-
-.btn-delete:hover {
-  transform: scale(1.1);
-}
-
-/* Sección de totales */
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.summary-label {
-  color: #4b5563;
-  font-size: 1.2rem;
-}
-
-.summary-value {
-  color: #111827;
-  font-weight: 600;
-  font-size: 1.2rem;
-}
-
-.summary-free {
-  color: #10b981; /* Verde para el "GRATIS" */
-  font-weight: 700;
-}
-
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 2px solid #f3f4f6;
-  margin-top: 20px;
-  padding-top: 20px;
-}
-
-.total-label {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #111827;
+.summary-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
 .total-value {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #f97316;
+  font-size: 3rem; /* Más grande como en la imagen */
+  font-weight: 900;
+  color: #047857; /* Verde MediExpress */
 }
 
-/* Botón de pago inferior */
+/* 6. Botón de Pago Gris redondeado */
 .btn-payment {
-  display: block;
   width: 100%;
-  max-width: 200px;
-  margin: 24px auto 0;
-  background-color: #f97316;
-  color: white;
-  padding: 20px;
-  border-radius: 20px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  text-align: center;
-  text-decoration: none;
-  box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+  background-color: #d1d5db;
+  color: #4b5563;
+  padding: 18px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
   transition: background 0.3s;
+  text-transform: uppercase;
 }
 
-.btn-payment:hover {
-  background-color: #ea580c;
+.btn-payment:hover:not(:disabled) {
+  background-color: #9ca3af;
+  color: #fff;
+}
+
+/* 7. Responsividad */
+@media (max-width: 900px) {
+  .cart-layout { 
+    flex-direction: column; 
+  }
+  .cart-right-column {
+    width: 100%;
+    min-width: unset;
+  }
 }

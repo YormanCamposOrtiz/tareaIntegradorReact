@@ -83,7 +83,7 @@ export function Perfil() {
           </div>
         </div>
       </header>
-
+        <br></br>
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="perfil-card">
@@ -93,7 +93,10 @@ export function Perfil() {
                  <User className="w-12 h-12" /> 
               </div>
               <h1 className="user-name">
-                  {usuario?.nombre ? usuario.nombre : "Cargando nombre..."}</h1>
+                {usuario?.nombre ? usuario.nombre : "Cargando nombre..."}</h1>
+              <h1 className="user-email">
+                {usuario?.correo ? usuario.correo : "Cargando correo..."}</h1>
+              
               
               {usuario?.rol === "ADMINISTRADOR" && (
                 <span className="badge-admin">
