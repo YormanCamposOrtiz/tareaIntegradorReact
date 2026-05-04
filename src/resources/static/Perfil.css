@@ -16,27 +16,35 @@
 /* Sección superior con degradado naranja */
 .perfil-banner {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  padding: 50px 20px;
+  padding: 10px 10px;
   text-align: center;
   color: white;
 }
 
 .user-avatar-container {
-  width: 90px;
-  height: 90px;
-  background: white;
+  width: 80px;  /* Ajusta el tamaño según tu diseño */
+  height: 80px;
+  background-color: white; /* El círculo blanco que ves en la imagen */
   border-radius: 50%;
-  display: flex;
+  display: flex; /* Crucial para centrar el icono */
   align-items: center;
   justify-content: center;
-  margin: 0 auto 15px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin: 0 auto; /* Para centrar el círculo en el banner */
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.3); /* Un pequeño borde para que resalte */
+}
+.user-avatar-container svg {
+  width: 50px;
+  height: 50px;
+  stroke-width: 2;
+  color: #ea580c;/* Hace las líneas del icono más visibles */
 }
 
 .user-name {
   font-size: 2.2rem;
   font-weight: 800;
   margin-bottom: 5px;
+  margin-top: -5px;
 }
 
 .user-email {
@@ -46,14 +54,14 @@
 
 /* Opciones del menú */
 .perfil-options {
-  padding: 30px;
+  padding: 20px;
 }
 
 .perfil-option-item {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 24px;
+  padding: 14px;
   background: #fffaf5;
   border-radius: 25px;
   margin-bottom: 16px;
@@ -70,7 +78,7 @@
   width: 60px;
   height: 60px;
   background: white;
-  border-radius: 15px;
+  border-radius: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,9 +105,10 @@
 
 .option-arrow {
   margin-left: auto;
-  font-size: 1.5rem;
+  font-size: 2.5rem;
   color: #f97316;
   font-weight: bold;
+  text-shadow: 1px 0 #f97316, -1px 0 #f97316, 0 1px #f97316, 0 -1px #f97316;
 }
 
 /* Botón de Logout */
@@ -112,9 +121,9 @@
   background: white;
   color: #ef4444;
   border: 2px solid #ef4444;
-  padding: 20px;
+  padding: 10px;
   border-radius: 25px;
-  margin-top: 30px;
+  margin-top: 10px;
   font-size: 1.3rem;
   font-weight: 700;
   cursor: pointer;

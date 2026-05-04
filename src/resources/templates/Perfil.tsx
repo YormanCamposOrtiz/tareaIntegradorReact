@@ -13,8 +13,9 @@ import "../static/Perfil.css";
 interface Usuario {
   id: number;
   nombre: string;
-  correo: string;
+  correo: string; // Asegúrate de usar la que tenga el dato en Neon
   rol: string; 
+  intentos_fallidos: number; // Columna visible en tu tabla[cite: 1]
 }
 
 export function Perfil() {
@@ -24,43 +25,35 @@ export function Perfil() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtenemos el correo guardado en el Login
+    // 1. Intentar obtener el correo guardado
     const userEmail = localStorage.getItem("userEmail"); 
 
     if (!userEmail) {
+      console.warn("No hay sesión activa. Redirigiendo al login...");
       navigate("/login");
       return;
     }
-
-    // Buscamos los datos completos del usuario usando el correo
-    axios.get(`http://localhost:8080/api/usuarios/buscar?correo=${userEmail}`)
+    
+    // 2. Buscar datos en PostgreSQL (Neon) usando el correo recuperado
+    axios.get(`http://localhost:8080/api/auth/buscar?correo=${userEmail}`)
       .then((res) => {
-        setUsuario(res.data);
+        setUsuario(res.data); //[cite: 2]
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error al conectar con PostgreSQL:", err);
-        setError("No se pudo conectar con el servidor. Verifica que Spring Boot esté activo.");
+        setError("No se pudo conectar con el servidor de base de datos.");
         setLoading(false);
       });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail"); //[cite: 2]
+    localStorage.removeItem("userRole"); //
     navigate("/login");
   };
 
-  if (loading) return <div className="p-10 text-center">Cargando perfil de SaludPlus...</div>;
-  
-  if (error) return (
-    <div className="p-10 text-center text-red-500">
-      <p>{error}</p>
-      <button onClick={() => window.location.reload()} className="mt-4 text-orange-500 underline">
-        Reintentar conexión
-      </button>
-    </div>
-  );
+  if (loading) return <div className="p-10 text-center text-orange-500 font-bold">Cargando perfil de MediExpress...</div>;
 
   return (
     <div className="perfil-container">
@@ -75,7 +68,7 @@ export function Perfil() {
 
           <div className="header-center flex items-center gap-2">
             <Heart className="w-8 h-8 text-white fill-white" />
-            <span className="brand-title text-white text-2xl font-bold">SaludPlus</span>
+            <span className="brand-title text-white">MediExpress</span>
           </div>
 
           <div className="header-right flex gap-4">
@@ -97,15 +90,14 @@ export function Perfil() {
             {/* Sección de cabecera del perfil */}
             <div className="perfil-banner">
               <div className="user-avatar-container">
-                <User className="w-12 h-12 text-orange-500" />
+                 <User className="w-12 h-12" /> 
               </div>
-              <h1 className="user-name">{usuario?.nombre || "Usuario"}</h1>
-              <p className="user-email">{usuario?.correo}</p>
+              <h1 className="user-name">
+                  {usuario?.nombre ? usuario.nombre : "Cargando nombre..."}</h1>
               
               {usuario?.rol === "ADMINISTRADOR" && (
                 <span className="badge-admin">
-                  Modo Administrador
-                </span>
+                  Modo Administrador</span>
               )}
             </div>
 
@@ -139,6 +131,15 @@ export function Perfil() {
                 </div>
                 <span className="option-arrow">→</span>
               </Link>
+              
+              <Link to="#" className="perfil-option-item">
+                <div className="option-icon-box"><Heart /></div>
+                <div className="option-text">
+                  <h3>Favoritos</h3>
+                  <p>Productos guardados</p>
+                </div>
+                <span className="option-arrow">→</span>
+              </Link>
 
               <Link to="#" className="perfil-option-item">
                 <div className="option-icon-box"><Settings /></div>
@@ -150,11 +151,10 @@ export function Perfil() {
               </Link>
             </div>
           </div>
-
           <button onClick={handleLogout} className="btn-logout">
             <LogOut className="w-6 h-6" />
             Cerrar Sesión
-          </button>
+          </button><br></br>
         </div>
       </main>
 

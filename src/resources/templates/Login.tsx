@@ -16,47 +16,40 @@ export function Login() {
   const [credentials, setCredentials] = useState({ correo: "", contrasena: "" });
   const [error, setError] = useState("");
 
-  
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(""); // Limpiar errores previos
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(""); 
 
-  try {
-    const { correo, contrasena } = credentials; 
-    
-    // Enviamos la petición al backend
-    const response = await api.post('/auth/login', { correo, contrasena });
-    
-    const user = response.data;
+    try {
+      const { correo, contrasena } = credentials; 
+      
+      // Petición al backend
+      const response = await api.post('/auth/login', { correo, contrasena });
+      const user = response.data;
 
-    // Si el login es exitoso, guardamos info básica (opcionalmente un token si usaras JWT)
-    if (user.success) {
-      if (user.rol === 'ADMINISTRADOR') {
-        navigate('/dashboardHome');
+      // Si el login es exitoso
+      if (user.success) {
+        // --- GUARDAR EN LOCALSTORAGE ---
+        localStorage.setItem("userEmail", correo); //
+        localStorage.setItem("userRole", user.rol); //
+
+        if (user.rol === 'ADMINISTRADOR') {
+          navigate('/dashboardHome');
+        } else {
+          navigate('/');
+        }
+      }
+    } catch (err: any) {
+      if (err.response) {
+        const status = err.response.status;
+        if (status === 403) alert("Cuenta bloqueada temporalmente.");
+        else if (status === 401) alert("Usuario o contraseña incorrectos.");
+        else alert("Error en el servidor.");
       } else {
-        navigate('/');
+        alert("No se pudo conectar con el servidor.");
       }
     }
-  } catch (err: any) {
-    // CAPTURA DE ERRORES DEL BACKEND (Ataques de diccionario / Bloqueos)
-    if (err.response) {
-      const status = err.response.status;
-      const message = err.response.data.message;
-
-      if (status === 403) {
-        // Caso: Cuenta bloqueada por intentos fallidos
-        alert(message || "Cuenta bloqueada temporalmente. Intente en 15 minutos.");
-      } else if (status === 401) {
-        // Caso: Credenciales incorrectas
-        alert("Usuario o contraseña incorrectos.");
-      } else {
-        alert("Error en el servidor. Intente más tarde.");
-      }
-    } else {
-      alert("No se pudo conectar con el servidor.");
-    }
-  }
-};
+  };
 
 return (
     <div className="login-page-wrapper">
