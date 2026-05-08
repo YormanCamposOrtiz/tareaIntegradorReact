@@ -99,10 +99,7 @@ return (
     
     {/* 3. LADO DERECHO: ICONOS */}
     <div className="header-right">
-      <Link to="/login" title="Administración">
-        <Shield className="w-6 h-6 text-white hover:text-orange-200" />
-      </Link>
-      <Link to="/carrito" title="Carrito">
+        <Link to="/carrito" title="Carrito">
         <ShoppingBag className="w-6 h-6 text-white hover:text-orange-200" />
       </Link>
       <Link to="/perfil" title="Mi Perfil">
