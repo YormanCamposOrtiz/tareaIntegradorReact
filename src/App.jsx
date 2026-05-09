@@ -7,6 +7,8 @@ import { Login } from "./resources/templates/Login";
 import { DashboardHome } from "./resources/templates/DashboardHome";
 import { Carrito } from "./resources/templates/Carrito";
 import { Perfil } from "./resources/templates/Perfil";
+import { Registro } from "./resources/templates/Registro";
+
 
 function App() {
 
@@ -18,6 +20,7 @@ function App() {
         <Route path="/DashboardHome" element={<DashboardHome />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/registro" element={<Registro />} />
       </Routes>
     </BrowserRouter>
   );

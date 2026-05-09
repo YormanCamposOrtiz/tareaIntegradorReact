@@ -4,5 +4,34 @@
   --primary-orange: #f97316;
   --secondary-orange: #ea580c;
   --bg-soft: #fafaf9;
+}
+
+/* Resets globales para ocupar toda la pantalla sin bordes blancos */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+  background: var(--bg-soft);
+   overflow-x: hidden;
+}
   
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: var(--bg-soft);
+  overflow-x: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  background: inherit;
+  display: flex;
+  flex-direction: column;
 }

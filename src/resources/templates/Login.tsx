@@ -82,7 +82,7 @@ return (
           <h1>MediExpress</h1>
           <p className="login-subtitle">Panel de Administración</p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-1">
             
             {/* 3. CAMPO USUARIO */}
             <div>
@@ -117,11 +117,17 @@ return (
                 <Lock className="input-icon" />
               </div>
             </div>
-
+            <br></br>
+            <div className="mt-2 text-sm text-gray-600">
+              ¿No recuerdas tu contraseña? <Link to="/recuperar" className="text-orange-500 font-bold">toca aquí</Link>
+            </div>
             {/* 5. BOTÓN NARANJA SÓLIDO */}
             <button type="submit" className="login-button">
               Iniciar Sesión
-            </button>
+            </button><br></br><br></br>
+            <div className="mt-2 text-sm text-gray-600">
+              ¿Aun no tienes cuenta? <Link to="/registro" className="text-orange-500 font-bold">Regístrate aquí</Link>
+            </div>
           </form>
         </div>
       </main>

@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
   font-family: 'Plus Jakarta Sans', sans-serif; /* Usando tu fuente global */
   background-color: var(--bg-soft); /* El fondo suave beige/rosa de la imagen */
 }
@@ -17,7 +18,7 @@
   padding: 20px;
 }
 
-/* 2. La Tarjeta de Login (idéntica a la imagen) */
+/* 2. La Tarjeta de Login */
 .login-card {
   box-sizing: border-box; /* También para la tarjeta */
   background: white;
@@ -39,7 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px; /* Centrado horizontalmente */
+  margin: 0 auto 10px; /* Centrado horizontalmente */
   box-shadow: 0 10px 20px rgba(249, 115, 22, 0.2);
 }
 
@@ -54,16 +55,18 @@
 .login-card h1 {
   color: #1c1917; /* Gris muy oscuro */
   font-weight: 800;
-  font-size: 2.2rem;
+  font-size: 1.9 rem;
   letter-spacing: -0.03em;
   margin-bottom: 5px;
 }
 
 .login-subtitle {
   color: #6b7280; /* Gris medio */
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 400;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
+  margin-top: -5px;
+
 }
 
 /* 5. Estilo de los Labels */
