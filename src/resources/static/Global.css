@@ -3,7 +3,8 @@
 :root {
   --primary-orange: #f97316;
   --secondary-orange: #ea580c;
-  --bg-soft: #fafaf9;
+  --bg-soft: #faf9f9;
+  --bg-soft2: #ffe3b8;
 
   /* Extras que combinan */
   --white: #ffffff;
