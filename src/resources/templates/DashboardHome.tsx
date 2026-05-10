@@ -34,26 +34,21 @@ export function DashboardHome() {
       <main className="admin-content">
 
         <div className="module-grid">
+            <button className="module-btn" onClick={() => navigate("/DashboardVentas")}>
+               <span className="module-emoji">💰</span>
+                <h3>Ventas</h3>
+            </button>
 
-           <Link to="/DashboardVentas" className="module-btn-link">
-              <button className="module-btn">
-                 <span className="module-emoji">💰</span>
-                  <h3>Ventas</h3>
-              </button>
-           </Link>
+            <button className="module-btn">
+              <span className="module-emoji">🛒</span>
+              <h3>Compras</h3>
+            </button>
 
-          <button className="module-btn">
-            <span className="module-emoji">🛒</span>
-            <h3>Compras</h3>
-          </button>
+            <button className="module-btn" onClick={() => navigate("/DashboardProductos")}>
+               <span className="module-emoji">📦</span>
+                <h3>Productos</h3>
+            </button>
 
-
-           <Link to="/DashboardProductos" className="module-btn-link">
-              <button className="module-btn">
-                 <span className="module-emoji">📦</span>
-                  <h3>Productos</h3>
-              </button>
-           </Link>
           <button className="module-btn">
             <span className="module-emoji">🚚</span>
             <h3>Pedidos</h3>
