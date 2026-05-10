@@ -54,7 +54,6 @@ export function DashboardHome() {
                   <h3>Productos</h3>
               </button>
            </Link>
-
           <button className="module-btn">
             <span className="module-emoji">🚚</span>
             <h3>Pedidos</h3>

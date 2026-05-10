@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Lock, Heart } from "lucide-react";
 import api from "../../api";
+import "../static/Login.css";
+import "../static/Header.css";
+import "../static/Global.css";
 
 export function RestablecerPassword() {
   const [searchParams] = useSearchParams();
