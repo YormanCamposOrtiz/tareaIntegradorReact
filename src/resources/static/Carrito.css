@@ -1,0 +1,128 @@
+/* 1. Título principal con fuente cursiva */
+.carrito-title {
+  font-family: 'Lobster', cursive;
+  font-size: 3.5rem;
+  text-align: center;
+  margin: 40px 0;
+  color: #000;
+}
+
+/* 1. Contenedor general del carrito */
+.carrito-container {
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2. Contenedor principal del contenido */
+.cart-main-container {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 20px 30px;
+  flex: 1;
+}
+
+/* 3. Contenedor de las dos columnas */
+.cart-layout {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  gap: 30px;
+  align-items: flex-start; /* Evita que las tarjetas se estiren */
+}
+
+/* 4. Proporciones de las columnas */
+.cart-left-column { 
+  flex: 2; 
+}
+
+.cart-right-column { 
+  flex: 1; 
+  min-width: 350px;
+}
+
+/* 4. Cuadro celeste de "Carrito Vacío" */
+.cart-empty-section {
+  background-color: #dcf5fa;
+  border-radius: 12px;
+  padding: 60px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.cart-empty-section svg {
+  color: #134e4a;
+  width: 50px;
+  height: 50px;
+}
+
+.cart-empty-text {
+  color: #0891b2;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* 5. Tarjeta de Resumen (Derecha) */
+.carrito-summary-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border: 1px solid #f3f4f6;
+  position: sticky; /* Se queda fija al hacer scroll */
+  top: 100px;
+  min-height: 320px;
+}
+
+.summary-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.total-value {
+  font-size: 3rem; /* Más grande como en la imagen */
+  font-weight: 900;
+  color: #047857; /* Verde MediExpress */
+}
+
+/* 6. Botón de Pago Gris redondeado */
+.btn-payment {
+  width: 100%;
+  background-color: #d1d5db;
+  color: #4b5563;
+  padding: 18px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-transform: uppercase;
+}
+
+.btn-payment:hover:not(:disabled) {
+  background-color: #9ca3af;
+  color: #fff;
+}
+
+/* 7. Responsividad */
+@media (max-width: 900px) {
+  .cart-layout { 
+    flex-direction: column; 
+  }
+  .cart-right-column {
+    width: 100%;
+    min-width: unset;
+  }
+}

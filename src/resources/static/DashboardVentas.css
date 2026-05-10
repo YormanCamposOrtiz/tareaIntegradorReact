@@ -1,0 +1,144 @@
+/* Contenedor Principal con Fondo y Fuente */
+.ventas-container {
+    min-height: 100vh;
+    background-color: #fdf2f0; /* Un rosa muy suave de fondo */
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Usamos una fuente más limpia */
+}
+
+/* HEADER MINIMALISTA */
+.admin-header {
+    background-color: #f97316; /* Tu naranja corporativo */
+    padding: 10px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.cursor-pointer { cursor: pointer; }
+
+.header-icons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* AREA DE CONTENIDO (SIDEBAR Y TABLAS) */
+.ventas-content {
+    display: flex; /* Cambiamos grid por flex para control total */
+    gap: 20px;
+    padding: 30px;
+    flex-grow: 1;
+}
+
+/* BARRA LATERAL IZQUIERDA (CONTROLES) */
+.ventas-sidebar {
+    width: 280px; /* Ancho fijo para el sidebar */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.ventas-sidebar button, .ventas-sidebar input {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.ventas-sidebar button {
+    padding: 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ventas-sidebar button:hover { transform: scale(1.03); }
+
+.btn-anular { background: #f97316; color: white; }
+.btn-actualizar { background: #004d4d; color: white; }
+.btn-buscar { 
+    background: white; 
+    color: #008000; 
+    border: 2px solid #008000 !important; 
+}
+.btn-cerrar { 
+    background: white; 
+    color: red; 
+    border: 2px solid red !important; 
+    margin-top: auto; /* Empuja al final */
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #333;
+}
+
+.filter-group input {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #f1f5f9;
+}
+
+/* AREA PRINCIPAL DE TABLAS */
+.ventas-main {
+    flex-grow: 1; /* Ocupa el resto del espacio */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.table-wrapper {
+    background: white;
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    height: calc(50% - 10px); /* Ocupa la mitad menos el gap */
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead th {
+    background: #f97316;
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Bordes redondeados para la cabecera de la tabla */
+thead th:first-child { border-top-left-radius: 15px; }
+thead th:last-child { border-top-right-radius: 15px; }
+
+tbody td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 2px solid white; /* Bordes blancos entre filas */
+    background: #f1f5f9; /* Tono gris suave para las filas */
+    color: #333;
+}

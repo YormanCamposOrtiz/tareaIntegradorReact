@@ -1,0 +1,362 @@
+
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-soft);
+  color: #1c1917;
+}
+
+
+
+/* SECCIÓN RELOJ - Banner de Oferta */
+.promo-banner {
+  width: 100%;
+  background-color: #f97316; /* Naranja principal */
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+}
+
+.promo-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 🔥 separa texto y reloj */
+  gap: 20px;
+  color: white;
+  width: 100%;
+  max-width: 700px; /* 🔥 controla el ancho */
+}
+
+/* Caja del reloj horizontal */
+.timer-box {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  min-width: 95px; /* Evita que la caja se mueva al cambiar los números */
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: row; /* Alineación horizontal forzada */
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Un poco más de aire */
+}
+
+.timer-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  color: white !important; /* Fuerza el blanco */
+}
+
+.timer-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white !important; /* Fuerza el blanco */
+  opacity: 0.9;
+  text-transform: lowercase;
+}
+
+.timer-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;   /* 🔥 nunca baja */
+}
+
+.promo-content span {
+  font-weight: 800; /* El peso más grueso disponible */
+  letter-spacing: 0.05em; /* Un poco más de espacio entre letras para que no se peguen al ser gruesas */
+  text-transform: uppercase;
+}
+
+
+
+
+
+
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.fade-in {
+  animation: fadeUp 0.7s ease;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Home.css */
+
+.offer-title {
+  /* Usamos una tipografía que transmita calidad */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  
+  /* Sombra sutil de texto para asegurar legibilidad sobre imágenes claras */
+  text-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+
+
+
+
+
+/* CONTENEDOR */
+.section-header {
+  text-align: center;
+  
+}
+
+/* TÍTULO PRINCIPAL */
+.section-title {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #1c1917;
+  letter-spacing: -0.03em;
+  position: relative;
+  display: inline-block;
+  
+}
+
+/* EFECTO SUBRAYADO MODERNO */
+.section-title::after {
+  content: "";
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  border-radius: 10px;
+}
+
+/* SUBTÍTULO */
+.section-subtitle {
+  font-size: 2rem;
+  color: #78716c;
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+
+
+
+
+
+/* CONTENEDOR GENERAL */
+.carousel-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* TEXTO SUPERIOR */
+.carousel-header {
+  margin-bottom: 20px;
+}
+
+.carousel-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1c1917;
+  letter-spacing: -0.02em;
+}
+
+/* TARJETA DEL CARRUSEL */
+.carousel-card {
+  position: relative;
+  height: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  transition: transform 0.4s ease;
+}
+
+.carousel-card:hover {
+  transform: scale(1.02);
+}
+
+/* IMAGEN */
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* OVERLAY */
+.carousel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.7),
+    rgba(0,0,0,0.2),
+    transparent
+  );
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 30px;
+}
+
+/* BOTÓN */
+.carousel-btn {
+  background: #f97316;
+  color: white;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: #ea580c;
+  transform: translateY(-2px);
+}
+
+
+
+
+
+
+
+
+
+/* Contenedor de la Grid */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  width: 100%;
+  margin-bottom: 60px;
+}
+
+/* Tarjeta Individual */
+.category-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px 20px;
+  display: flex;           /* Usamos flex para centrar contenido */
+  flex-direction: column;
+  align-items: center;     /* Centra el círculo y texto horizontalmente */
+  text-align: center;
+  transition: 0.3s ease;
+  text-decoration: none !important; /* Quita el subrayado */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* El círculo del Icono/Emoji */
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem; /* Tamaño del emoji */
+  margin-bottom: 15px;
+  /* El color de fondo vendrá de la prop {cat.color} en el JSX */
+}
+
+/* Nombre de la Categoría (H4) en NEGRO */
+.category-card h4 {
+  color: #111827 !important; 
+  font-weight: 700;
+  margin-bottom: 5px;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+/* Contador de Productos en NARANJA */
+.category-card p {
+  color: #f97316 !important; /* Naranja de MediExpress */
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+
+
+
+/* Sección ¿Por qué rgb(253, 240, 240)us? */
+.benefits-section {
+  background-color: #ffffff;
+  padding: 80px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Grid alineado con el de categorías */
+.benefits-grid {
+  display: grid;
+  /* Crea 3 columnas iguales que no bajan a menos que la pantalla sea muy pequeña */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 40px;
+  max-width: 1100px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.benefit-card {
+  background: rgb(255, 249, 245);
+  border-radius: 24px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.4s ease;
+  text-decoration: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra el icono y textos */
+}
+
+.benefit-card:hover {
+  transform: translateY(-10px);
+  background-color: #fff7ed; /* orange-50 */
+}
+
+.icon-wrapper {
+  width: 75px;
+  height: 75px;
+  background-color: #f97316;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.2);
+}
+
+.benefit-title {
+  color: #111827; /* Negro para el título */
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.benefit-desc {
+  color: #6b7280; /* Gris para la descripción */
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+
