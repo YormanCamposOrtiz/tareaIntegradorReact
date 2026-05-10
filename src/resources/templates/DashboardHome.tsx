@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import {Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+
+import { DashboardHeader } from './fragments/DashboardHeader';
+
 
 import "../static/HomeDasboard.css";
 import "../static/HeaderDasboard.css";
@@ -25,46 +27,33 @@ export function DashboardHome() {
 
   return (
     <div className="admin-container">
-      {/* HEADER MINIMALISTA */}
-      <header className="admin-header">
 
-        <div className="header-brand">
-        <Heart className="w-8 h-8 text-white fill-white" />
-        <span className="brand-title text-white">MediExpress</span>
-        <span className="admin-clock">{hora}</span>
-        </div>
-
-        <div className="header-actions">
-          <button onClick={handleLogout} className="btn-logout">
-            Salir 🚪
-          </button>
-        </div>
-
-      </header>
+      <DashboardHeader />
 
       {/* CONTENIDO PRINCIPAL */}
       <main className="admin-content">
-        <div className="welcome-text">
-          <h2>Panel de Gestión</h2>
-          <p>Selecciona un módulo para trabajar</p>
-        </div>
 
-        {/* REJILLA DE 4 BOTONES GRANDES */}
         <div className="module-grid">
-          <button className="module-btn">
-            <span className="module-emoji">💰</span>
-            <h3>Ventas</h3>
-          </button>
+
+           <Link to="/DashboardVentas" className="module-btn-link">
+              <button className="module-btn">
+                 <span className="module-emoji">💰</span>
+                  <h3>Ventas</h3>
+              </button>
+           </Link>
 
           <button className="module-btn">
             <span className="module-emoji">🛒</span>
             <h3>Compras</h3>
           </button>
 
-          <button className="module-btn">
-            <span className="module-emoji">📦</span>
-            <h3>Productos</h3>
-          </button>
+
+           <Link to="/DashboardProductos" className="module-btn-link">
+              <button className="module-btn">
+                 <span className="module-emoji">📦</span>
+                  <h3>Productos</h3>
+              </button>
+           </Link>
 
           <button className="module-btn">
             <span className="module-emoji">🚚</span>

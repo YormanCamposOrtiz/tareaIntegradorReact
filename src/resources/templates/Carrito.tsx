@@ -51,7 +51,6 @@ export function Carrito() {
           </div>
           
           <div className="header-right flex gap-4">
-            <Link to="/login"><Shield className="w-6 h-6 text-white" /></Link>
             <Link to="/carrito"><ShoppingBag className="w-6 h-6 text-white" /></Link>
             <Link to="/perfil"><User className="w-6 h-6 text-white" /></Link>
           </div>
