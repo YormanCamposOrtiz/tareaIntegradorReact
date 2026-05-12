@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Lock, Mail, Heart, Home, ArrowLeft  } from "lucide-react";
+import { Lock, Mail, Heart, Home, Eye, EyeOff, ArrowLeft  } from "lucide-react";
+
 
 import { Footer } from './fragments/Footer';
 
@@ -13,6 +14,8 @@ import "../static/Global.css";
 export function RestablecerPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const token = searchParams.get("token"); // Lee el token de la URL
 
   const [nuevaContrasena, setNuevaContrasena] = useState("");
@@ -49,43 +52,66 @@ export function RestablecerPassword() {
         </div>
       </header>
 
-      <main className="login-main">
-        <div className="login-card text-center">
-          <div className="logo-circle"><Heart /></div>
-          <h1>Nueva Contraseña</h1>
-          <p className="login-subtitle">Ingresa tu nueva clave de acceso</p>
+<main className="login-main">
+  <div className="login-card text-center">
+    <div className="logo-circle"><Heart /></div>
+    <h1>Nueva Contraseña</h1>
+    <p className="login-subtitle">Ingresa tu nueva clave de acceso</p> <br />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="input-group">
-              <input
-                type="password"
-                className="login-input"
-                placeholder="Nueva contraseña (mín. 8)"
-                value={nuevaContrasena}
-                onChange={(e) => setNuevaContrasena(e.target.value)}
-                required
-              />
-              <Lock className="input-icon" />
-            </div>
-            <br></br>
-            <div className="input-group">
-              <input
-                type="password"
-                className="login-input"
-                placeholder="Confirmar contraseña"
-                value={confirmar}
-                onChange={(e) => setConfirmar(e.target.value)}
-                required
-              />
-              <Lock className="input-icon" />
-            </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      
+      {/* CAMPO: NUEVA CONTRASEÑA */}
+      <div className="input-group relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          className="login-input w-full"
+          style={{ paddingRight: '45px' }}
+          placeholder="Nueva contraseña (mín. 8)"
+          value={nuevaContrasena}
+          onChange={(e) => setNuevaContrasena(e.target.value)}
+          required
+        />
+        <Lock className="input-icon" />
+        
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div> <br />
 
-            <button type="submit" className="login-button">
-              Actualizar Contraseña
-            </button>
-          </form>
-        </div>
-      </main>
+      {/* CAMPO: CONFIRMAR CONTRASEÑA */}
+      <div className="input-group relative">
+        <input
+          type={showConfirm ? "text" : "password"}
+          className="login-input w-full"
+          style={{ paddingRight: '45px' }}
+          placeholder="Confirmar contraseña"
+          value={confirmar}
+          onChange={(e) => setConfirmar(e.target.value)}
+          required
+        />
+        <Lock className="input-icon" />
+
+        <button
+          type="button"
+          onClick={() => setShowConfirm(!showConfirm)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+          style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div> <br />
+
+      <button type="submit" className="login-button">
+        Actualizar Contraseña
+      </button>
+    </form>
+  </div>
+</main>
      
     <Footer/>
 

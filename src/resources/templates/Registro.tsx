@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Lock, User, Heart, Home, Mail } from "lucide-react";
+import { Lock, User, Heart, Home, Eye, EyeOff, Mail } from "lucide-react";
+
 
 import { Footer } from './fragments/Footer';
 
@@ -11,6 +12,7 @@ import "../static/Global.css";
 
 export function Registro() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ 
     nombre: "", 
     correo: "", 
@@ -69,7 +71,7 @@ export function Registro() {
           </div>
 
           <h1>Crea tu Cuenta</h1>
-          <p className="login-subtitle">Únete a MediExpress hoy</p>
+          <p className="login-subtitle">Únete a MediExpress hoy</p> <br />
 
           <form onSubmit={handleSubmit} className="space-y-4">
             
@@ -87,7 +89,7 @@ export function Registro() {
                 />
                 <User className="input-icon" />
               </div>
-            </div>
+            </div> <br />
 
             {/* CAMPO CORREO */}
             <div>
@@ -103,27 +105,40 @@ export function Registro() {
                 />
                 <Mail className="input-icon" />
               </div>
-            </div>
+            </div> <br />
 
-            {/* CAMPO CONTRASEÑA */}
-            <div>
-              <label className="login-label">Contraseña</label>
-              <div className="input-group">
-                <input
-                  type="password"
-                  className="login-input"
-                  placeholder="Mínimo 8 caracteres"
-                  value={formData.contrasena}
-                  onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
-                  required
-                />
-                <Lock className="input-icon" />
-              </div>
-            </div>
+{/* CAMPO CONTRASEÑA CON OJITO */}
+<div>
+  <label className="login-label">Contraseña</label>
+  <div className="input-group relative"> {/* "relative" es clave para posicionar el ojo */}
+    <input
+      type={showPassword ? "text" : "password"} 
+      className="login-input"
+      style={{ paddingRight: '45px' }} // Espacio para que el texto no tape el ojo
+      placeholder="Mínimo 8 caracteres"
+      value={formData.contrasena}
+      onChange={(e) => setFormData({ ...formData, contrasena: e.target.value })}
+      required
+    />
+    
+    {/* Icono de Candado (Izquierda) */}
+    <Lock className="input-icon" />
+
+    {/* BOTÓN DEL OJITO (Derecha) */}
+    <button
+      type="button" // IMPORTANTE: para que no envíe el formulario al hacer clic
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+      style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+</div>
 
             <button type="submit" className="login-button mt-4">
               Registrarse
-            </button>
+            </button> <br /><br />
 
             <div className="mt-4 text-sm text-gray-600">
               ¿Ya tienes cuenta? <Link to="/login" className="text-orange-500 font-bold">Inicia sesión aquí</Link>

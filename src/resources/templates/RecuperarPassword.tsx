@@ -52,7 +52,7 @@ export function RecuperarPassword() {
           {!enviado ? (
             <>
               <h1>Recuperar Contraseña</h1>
-              <p className="login-subtitle">Enviaremos un enlace a tu correo</p>
+              <p className="login-subtitle">Enviaremos un enlace a tu correo</p> <br />
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -68,12 +68,12 @@ export function RecuperarPassword() {
                     />
                     <Mail className="input-icon" />
                   </div>
-                </div>
+                </div> <br />
 
                 <button type="submit" className="login-button">
                   Enviar Instrucciones
                 </button>
-              </form>
+              </form> <br />
             </>
           ) : (
             <div className="py-6">
