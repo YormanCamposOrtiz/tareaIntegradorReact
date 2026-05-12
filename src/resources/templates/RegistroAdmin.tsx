@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, ShieldCheck } from "lucide-react";
 import api from "../../api";
 import { DashboardHeader } from './fragments/DashboardHeader';
+import "../static/RegAdmin.css";
 
 
 export function RegistroAdmin() {
@@ -32,24 +33,25 @@ export function RegistroAdmin() {
                 <div className="logo-circle"><ShieldCheck /></div>
                 <h1>Nuevo Administrador</h1>
                 <form onSubmit={handleSubmit}>
+                    <br/>
                     <input 
                         type="text" 
                         className="login-input" 
                         placeholder="Nombre" 
                         onChange={(e) => setFormData({...formData, nombre: e.target.value})} 
-                    />
+                    /><br/>
                     <input 
                         type="email" 
                         className="login-input" 
                         placeholder="Correo" 
                         onChange={(e) => setFormData({...formData, correo: e.target.value})} 
-                    />
+                    /><br/>
                     <input 
                         type="password" 
                         className="login-input" 
                         placeholder="Contraseña" 
                         onChange={(e) => setFormData({...formData, contrasena: e.target.value})} 
-                    />
+                    /><br/>
                     <button type="submit" className="login-button">Registrar Admin</button>
                 </form>
             </div>
