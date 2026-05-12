@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Verifica que sea react-router-dom
 import { Link } from "react-router-dom"; 
-import { Lock, User, Heart, ShoppingBag, Home , Shield } from "lucide-react";
+import { Lock, User, Heart, Eye, EyeOff, Home , Shield } from "lucide-react";
 
 import { Footer } from './fragments/Footer';
 
@@ -12,6 +12,7 @@ import "../static/Global.css";
 
 export function Login() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({ correo: "", contrasena: "" });
   const [error, setError] = useState("");
 
@@ -102,21 +103,32 @@ return (
             </div>
 
             {/* 4. CAMPO CONTRASEÑA */}
-            <div>
-              <label className="login-label">Contraseña</label>
-              <div className="input-group">
-                <input
-                  type="password"
-                  className="login-input"
-                  placeholder="Ingresa tu contraseña"
-                  value={credentials.contrasena} // AGREGAR ESTO
-                  onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })} // AGREGAR ESTO
-                  required
-                />
-                {/* Icono de Candado DENTRO */}
-                <Lock className="input-icon" />
-              </div>
-            </div>
+<div>
+  <label className="login-label">Contraseña</label>
+  <div className="input-group relative"> {/* Añadimos relative para posicionar el ojo */}
+    <input
+      type={showPassword ? "text" : "password"} // <--- CAMBIO DINÁMICO
+      className="login-input pr-10" // pr-10 para que el texto no tape el ojo
+      placeholder="Ingresa tu contraseña"
+      value={credentials.contrasena}
+      onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })}
+      required
+    />
+    
+    {/* Icono de Candado (Izquierda) */}
+    <Lock className="input-icon" />
+
+    {/* BOTÓN DEL OJITO (Derecha) */}
+    <button
+      type="button"
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  </div>
+</div>
+
             <br></br>
             <div className="mt-2 text-sm text-gray-600">
               ¿No recuerdas tu contraseña? <Link to="/recuperar" className="text-orange-500 font-bold">toca aquí</Link>

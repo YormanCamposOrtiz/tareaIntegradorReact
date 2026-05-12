@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Search, Trash2, UserPlus, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Para que el botón de Crear funcione
+
 import api from "../../api";
-import "../static/Dashboard.css"; 
+
+import "../static/DashboardUsuarios.css"; 
 import { DashboardHeader } from './fragments/DashboardHeader';
 
 export function GestionUsuarios() {
@@ -66,8 +68,13 @@ export function GestionUsuarios() {
 
   return (
         
-    <div className="dashboard-container"><DashboardHeader />
-      
+
+    
+    <div className="dashboard-container">
+
+      <DashboardHeader />
+
+    <div className="dashboard-container2">
       <div className="dashboard-header">
         <h1>Gestión de Usuarios</h1>
         
@@ -150,5 +157,7 @@ export function GestionUsuarios() {
         </div>
       </div>
     </div>
+    </div>
+      
   );
 }

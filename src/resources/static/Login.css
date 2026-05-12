@@ -153,3 +153,27 @@
 .login-button:active {
   transform: scale(0.98); /* Efecto de clic */
 }
+
+/* Contenedor del input debe ser relativo */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* El ojo a la derecha */
+.input-group button {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Ajuste para que el texto de la contraseña no choque con el ojo */
+.login-input {
+  padding-right: 40px !important; 
+}
