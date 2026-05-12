@@ -1,0 +1,182 @@
+/* 1. Título principal: Menos agresivo, más elegante */
+.carrito-title {
+  font-family: 'Lobster', cursive;
+  font-size: 3rem;
+  text-align: center;
+  margin: 40px 0;
+  color: #1f2937; /* Gris muy oscuro, no negro puro */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Contenedor general */
+.carrito-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f9fafb; /* Fondo neutro para que resalten las cards */
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-main-container {
+  width: 100%;
+  max-width: 1200px; /* Reducido para mejor lectura */
+  margin: 0 auto;
+  padding: 0 20px 60px 20px;
+  flex: 1;
+}
+
+.cart-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* Aumentamos el espacio para los productos */
+.cart-left-column { 
+  flex: 3; /* Antes era 1.8, ahora ocupa mucho más espacio */
+}
+
+/* Reducimos el ancho de la columna de resumen */
+.cart-right-column { 
+  flex: 1; 
+  min-width: 300px; /* Reducido de 380px para que no sea tan ancha */
+}
+
+.cart-empty-section {
+  background-color: #ffffff;
+  border: 2px dashed #e5e7eb; /* Estilo 'placeholder' */
+  border-radius: 20px;
+  padding: 80px 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.cart-empty-section svg {
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.cart-empty-text {
+  color: #64748b;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.btn-go-shop {
+  background: #3b82f6;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.btn-go-shop:hover {
+  transform: translateY(-2px);
+  background: #2563eb;
+}
+
+/* 3. Columna Derecha (Resumen) */
+.cart-right-column { 
+  flex: 1; 
+  min-width: 380px;
+}
+
+.carrito-summary-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  padding: 35px;
+  border: 1px solid #f3f4f6;
+  position: sticky;
+  top: 120px;
+}
+
+.summary-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 15px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.total-row {
+  display: flex;
+  flex-direction: row; /* Cambiado de column a row para que ocupen una sola línea */
+  justify-content: space-between; /* Empuja etiqueta a la izquierda y precio a la derecha */
+  align-items: center;
+  margin: 20px 0;
+  padding: 15px; /* Un poco más compacto */
+  background: #f0fdf4; 
+  border-radius: 12px;
+}
+
+.total-label {
+  font-size: 0.9rem; /* Más pequeño */
+  color: #065f46;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.total-value {
+  font-size: 1.8rem; /* Reducido de 3.5rem para que sea más elegante y pequeño */
+  font-weight: 800;
+  color: #059669; 
+  line-height: 1;
+}
+
+/* 4. Botón de WhatsApp - Mejorado para Conversión */
+.btn-payment {
+  width: 100%;
+  background-color: #25D366; /* Verde Oficial WhatsApp */
+  color: white;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.39);
+}
+
+.btn-payment:hover {
+  background-color: #128C7E;
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.23);
+}
+
+.btn-payment i {
+  font-size: 1.4rem;
+}
+
+/* Responsividad mejorada */
+@media (max-width: 1024px) {
+  .cart-layout {
+    flex-direction: column;
+  }
+  .cart-right-column {
+    width: 100%;
+    min-width: unset;
+  }
+  .carrito-summary-card {
+    position: static;
+  }
+}
