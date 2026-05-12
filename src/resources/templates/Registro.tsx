@@ -14,7 +14,8 @@ export function Registro() {
   const [formData, setFormData] = useState({ 
     nombre: "", 
     correo: "", 
-    contrasena: "" 
+    contrasena: "",
+    rol: "Usuario"
   });
   const [error, setError] = useState("");
 
