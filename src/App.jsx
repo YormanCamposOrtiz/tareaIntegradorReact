@@ -10,6 +10,9 @@ import { Perfil } from "./resources/templates/Perfil";
 import { Registro } from "./resources/templates/Registro";
 import { RecuperarPassword } from "./resources/templates/RecuperarPassword";
 import { RestablecerPassword } from "./resources/templates/RestablecerPassword";
+import { RegistroAdmin } from "./resources/templates/RegistroAdmin";
+import { GestionUsuarios } from "./resources/templates/GestionUsuarios";
+
 
 import { DashboardProductos } from './resources/templates/DashboardProductos';
 import { DashboardHome } from "./resources/templates/DashboardHome";
@@ -23,7 +26,7 @@ function App() {
 
     <BrowserRouter>
       <Routes>
-
+        
         <Route path="/" element={<Inicio />} />
         <Route path="/login" element={<Login />} />
         <Route path="/carrito" element={<Carrito />} />
@@ -31,6 +34,8 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
         <Route path="/restablecer" element={<RestablecerPassword />} />
+        <Route path="/admin/registro" element={<RegistroAdmin />} />
+        <Route path="/admin/gestion" element={<GestionUsuarios />} />
 
         <Route path="/DashboardHome" element={<DashboardHome />} />
         <Route path="/DashboardVentas" element={<DashboardVentas />} />

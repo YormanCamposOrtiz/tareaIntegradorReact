@@ -103,6 +103,13 @@ export function DashboardHome() {
                 <p>Registrar personal</p>
               </div>
             </button>
+            <button className="module-card admin-special" onClick={() => navigate("/admin/gestion")}>
+              <div className="module-icon"><UserPlus size={32}/></div>
+              <div className="module-info">
+                <h3>Gestionar Admins</h3>
+                <p>Administrar personal</p>
+              </div>
+            </button>
           </div>
         </main>
         <br></br>
