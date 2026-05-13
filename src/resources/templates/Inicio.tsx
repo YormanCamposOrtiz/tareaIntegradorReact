@@ -1,0 +1,185 @@
+import { useState, useEffect } from "react";
+
+import { Header } from './fragments/Header';
+import { Footer } from './fragments/Footer';
+
+import api from "../../api";
+
+import "../static/Inicio.css";
+import "../static/Header.css";
+import "../static/Footer.css";
+import "../static/Global.css";
+
+import imagen1 from "/src/resources/static/assets/imagen1.jpg";
+import imagen2 from "/src/resources/static/assets/imagen2.png";
+import imagen3 from "/src/resources/static/assets/imagen3.jpg";
+
+export function Inicio() {
+  
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOffer, setSelectedOffer] = useState(0);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
+
+  // 2. Datos locales (Sin llamadas a API por ahora)
+  const offers = [
+    {  image: imagen3, discount: 20, category: "Vitaminas" },
+    {  image: imagen2, discount: 0, category: "Envío" },
+    {  image: imagen1, discount: 15, category: "Medicamentos" },
+  ];
+
+
+  interface Categoria {
+  id: number;
+  nombre: string;
+  emoji?: string;
+}
+
+interface Producto {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  imagen?: string;
+  precio_venta: number;
+  categoria?: Categoria;
+}
+
+    useEffect(() => {
+        fetchDatos();
+    }, []);
+
+const fetchDatos = async () => {
+    try {
+
+        const response = await api.get('/productos');
+        const categoriasRes = await api.get('/categorias');
+
+        setProductos(response.data);
+        setCategorias(categoriasRes.data);
+
+    } catch (error) {
+
+        console.error("Error al cargar datos:", error);
+
+    } finally {
+
+        setLoading(false);
+
+    }
+};
+
+  // 4. Auto-carrusel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSelectedOffer(prev => (prev + 1) % offers.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [offers.length]);
+
+
+
+
+  // --- LÓGICA DE FILTRADO ---
+const productosFiltrados = categoriaSeleccionada
+  ? productos.filter(p => p.categoria?.id === categoriaSeleccionada)
+  : productos;
+
+
+return (
+
+<div className="home-container min-h-screen bg-gray-50">
+
+<Header />
+
+<main className="w-full px-6 py-10">
+
+{/* Carrusel */}
+<div className="carousel-container">
+
+  {/* 🔥 CARRUSEL */}
+  <div className="carousel-card fade-in">
+    
+    <img 
+      src={offers[selectedOffer].image} 
+      className="carousel-image"
+    />
+
+    <div className="carousel-overlay">
+
+    </div>
+
+  </div>
+</div>
+
+
+{/* 🏷️ SECCIÓN DE CATEGORÍAS (Reales de tu BD) */}
+        <section className="mt-16 w-full flex flex-col items-center">
+          <h2 className="section-title">Nuestras Categorías</h2>
+          <div className="category-grid">
+            {/* Opción para ver "Todos" */}
+            <div 
+              className={`category-card ${!categoriaSeleccionada ? 'active' : ''}`}
+              onClick={() => setCategoriaSeleccionada(null)}
+            >
+              <div className="icon-circle bg-blue-100">🏠</div>
+              <h4>Todas</h4>
+            </div>
+
+            {categorias.map((cat) => (
+              <div 
+                key={cat.id} 
+                className={`category-card ${categoriaSeleccionada === cat.id ? 'active' : ''}`}
+                onClick={() => setCategoriaSeleccionada(cat.id)}
+              >
+                <div className="icon-circle bg-orange-100">
+                  {cat.emoji || "📦"}
+                </div>
+                <h4>{cat.nombre}</h4>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
+
+        {/* 💊 GRILLA DE PRODUCTOS */}
+        <section className="mt-12">
+          <h3 className="products-grid-title">
+            {categoriaSeleccionada 
+              ? `Resultados en ${categorias.find(c => c.id === categoriaSeleccionada)?.nombre}` 
+              : "Todos nuestros productos"}
+          </h3>
+
+          <div className="products-grid">
+            {productosFiltrados.length > 0 ? (
+              productosFiltrados.map((prod) => (
+                <div key={prod.id} className="product-card">
+                  <div className="product-image-wrapper">
+                    <img 
+                      src={prod.imagen || 'https://via.placeholder.com/150'} 
+                      alt={prod.nombre} 
+                    />
+                  </div>
+                  <div className="product-info">
+                    <span className="product-category-tag">
+                      {prod.categoria?.nombre}
+                    </span>
+                    <h4>{prod.nombre}</h4>
+                    <p className="product-price">S/ {prod.precio_venta.toFixed(2)}</p>
+                    <button className="btn-add-cart">Agregar</button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="no-results">No hay productos en esta categoría.</p>
+            )}
+          </div>
+        </section>
+
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
