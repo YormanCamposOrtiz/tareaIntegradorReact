@@ -53,4 +53,30 @@ header {
   letter-spacing: -0.04em;
 }
 
+.brand-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Estilo para los links de navegación */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    opacity: 1;
+    color: #ffedd5; /* un naranja muy claro (orange-100) */
+}
+
+/* Opcional: Efecto de desenfoque en el fondo si el navegador lo soporta */
+header.sticky {
+    backdrop-filter: blur(8px);
+    background-color: rgba(234, 88, 12, 0.95); /* Orange-600 con transparencia */
+}
 
