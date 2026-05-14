@@ -73,11 +73,6 @@ export function RegistroAdmin() {
     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
   </button>
 </div>
-
-<button type="submit" className="login-button">
-  Registrar Admin
-</button>
-
                     <br/>
                     <button type="submit" className="login-button">Registrar Admin</button>
                 </form>
