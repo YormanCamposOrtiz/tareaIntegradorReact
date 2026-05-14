@@ -10,9 +10,9 @@ import "../static/Header.css";
 import "../static/Footer.css";
 import "../static/Global.css";
 
-import imagen1 from "/src/resources/static/assets/imagen1.jpg";
-import imagen2 from "/src/resources/static/assets/imagen2.png";
-import imagen3 from "/src/resources/static/assets/imagen3.jpg";
+import imagen1 from "/src/resources/static/assets/oferta2.png";
+import imagen2 from "/src/resources/static/assets/oferta1.png";
+import imagen3 from "/src/resources/static/assets/oferta3.png";
 
 export function Inicio() {
   
