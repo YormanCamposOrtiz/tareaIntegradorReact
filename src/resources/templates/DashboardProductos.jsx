@@ -19,13 +19,18 @@ export function DashboardProductos() {
 
     // Estado del formulario
     const [formData, setFormData] = useState({
-        id: null,
-        nombre: '',
-        descripcion: '',
-        precio_compra: '',
-        precio_venta: '',
-        stock: '',
-        categoria: { id: '' }
+    id: null,
+    nombre: '',
+    descripcion: '',
+    precio_compra: '',
+    precio_venta: '',
+    stock: '',
+    // AJUSTADOS A JAVA:
+    stockMin: '', 
+    imagen: '',   
+    visibilidad: true,
+    categoria: { id: '' }
+
     });
 
     useEffect(() => {
@@ -124,54 +129,43 @@ export function DashboardProductos() {
         }
     };
 
-    // Eliminar producto
-    const handleDelete = async (id) => {
+// Borrado Lógico (Alternar visibilidad)
+const handleDelete = async (id) => {
+    if (!window.confirm("¿Cambiar el estado de visibilidad de este producto?")) return;
+    try {
+        // Llamamos al PatchMapping que definimos en el Controller
+        await api.patch(`/productos/${id}/visibilidad`);
+        fetchDatos();
+        alert("Estado actualizado");
+    } catch (error) {
+        alert("No se pudo actualizar la visibilidad");
+    }
+};
 
-        if (!window.confirm("¿Eliminar este producto?")) return;
-
-        try {
-
-            await api.delete(`/productos/${id}`);
-
-            fetchDatos();
-
-            alert("Producto eliminado");
-
-        } catch (error) {
-            alert("No se pudo eliminar el producto");
-        }
-    };
-
-    // Abrir modal
-    const openModal = (prod = null) => {
-
-        if (prod) {
-
-            setFormData({
-                id: prod.id,
-                nombre: prod.nombre || '',
-                descripcion: prod.descripcion || '',
-                precio_compra: prod.precio_compra || '',
-                precio_venta: prod.precio_venta || '',
-                stock: prod.stock || '',
-                categoria: { id: prod.categoria?.id || '' }
-            });
-
-        } else {
-
-            setFormData({
-                id: null,
-                nombre: '',
-                descripcion: '',
-                precio_compra: '',
-                precio_venta: '',
-                stock: '',
-                categoria: { id: '' }
-            });
-        }
-
-        setIsModalOpen(true);
-    };
+const openModal = (prod = null) => {
+    if (prod) {
+        setFormData({
+            id: prod.id,
+            nombre: prod.nombre || '',
+            descripcion: prod.descripcion || '',
+            precio_compra: prod.precio_compra || '',
+            precio_venta: prod.precio_venta || '',
+            stock: prod.stock || '',
+            // Ajuste aquí:
+            stockMin: prod.stockMin || '', 
+            imagen: prod.imagen || '',     
+            visibilidad: prod.visibilidad ?? true,
+            categoria: { id: prod.categoria?.id || '' }
+        });
+    } else {
+        setFormData({
+            id: null, nombre: '', descripcion: '', precio_compra: '',
+            precio_venta: '', stock: '', stockMin: '', imagen: '',
+            visibilidad: true, categoria: { id: '' }
+        });
+    }
+    setIsModalOpen(true);
+};
 
     const closeModal = () => setIsModalOpen(false);
 
@@ -192,73 +186,46 @@ export function DashboardProductos() {
 
                     <table>
 
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Producto</th>
-                                <th>Categoría</th>
-                                <th>Stock</th>
-                                <th>P. Compra</th>
-                                <th>P. Venta</th>
-                                <th className="text-center">Acciones</th>
-                            </tr>
-                        </thead>
+<thead>
+  <tr>
+    <th>Imagen</th>
+    <th>Producto</th>
+    <th>Categoría</th>
+    <th>Stock / Min</th>
+    <th>P. Venta</th>
+    <th className="text-center">Acciones</th>
+  </tr>
+</thead>
 
-                        <tbody>
+<tbody>
+    {productos.map((prod) => (
+        <tr key={prod.id} style={{ opacity: prod.visibilidad ? 1 : 0.5 }}>
+            <td>
+                <img 
+                   src={prod.imagen || 'https://via.placeholder.com/50'} // Antes imagen_url
+                     alt={prod.nombre} 
+                    className="img-tabla-mini" 
+                />
+            </td>
+            <td className="text-bold">
+                {prod.nombre}
+                {!prod.visibilidad && <span className="badge-oculto"> (Oculto)</span>}
+            </td>
+            <td>{prod.categoria?.emoji} {prod.categoria?.nombre}</td>
 
-                            {productos.map((prod) => (
-
-                                <tr key={prod.id}>
-
-                                    <td className="text-muted">
-                                        #{prod.id}
-                                    </td>
-
-                                    <td className="text-bold">
-                                        {prod.nombre}
-                                    </td>
-
-                                    <td>
-                                        <span className="cat-tag">
-                                            {prod.categoria?.emoji} {prod.categoria?.nombre}
-                                        </span>
-                                    </td>
-
-                                    <td className={prod.stock < 10 ? "low-stock" : ""}>
-                                        {prod.stock} uds.
-                                    </td>
-
-                                    <td className="text-price-alt">
-                                        s/{prod.precio_compra}
-                                    </td>
-
-                                    <td className="text-price">
-                                        s/{prod.precio_venta}
-                                    </td>
-
-                                    <td className="actions-cell">
-
-                                        <button
-                                            onClick={() => openModal(prod)}
-                                            className="btn-icon-edit"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleDelete(prod.id)}
-                                            className="btn-icon-delete"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            ))}
-
-                        </tbody>
+<           td className={prod.stock <= prod.stockMin ? "low-stock" : ""}>
+              {prod.stock} / <small>{prod.stockMin}</small>
+           </td>
+            <td className="text-price">s/{prod.precio_venta}</td>
+            <td className="actions-cell">
+                <button onClick={() => openModal(prod)} className="btn-icon-edit"><Edit size={18} /></button>
+                <button onClick={() => handleDelete(prod.id)} className="btn-icon-delete">
+                    {prod.visibilidad ? <Trash2 size={18} /> : <Eye size={18} />}
+                </button>
+            </td>
+        </tr>
+    ))}
+</tbody>
 
                     </table>
 
@@ -318,6 +285,42 @@ export function DashboardProductos() {
 
                             </div>
 
+                            {/* Campo para Imagen URL */}
+<div className="form-group">
+    <label>URL de la Imagen</label>
+    <input
+        type="text"
+        placeholder="https://..."
+        value={formData.imagen} // Antes imagen_url
+        onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
+    />
+</div>
+
+<div className="form-row">
+    {/* Campo Stock Actual */}
+    <div className="form-group">
+        <label>Stock Actual</label>
+        <input
+            type="number"
+            value={formData.stock}
+            required
+            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+        />
+    </div>
+    
+    {/* NUEVO: Campo Stock Mínimo */}
+<div className="form-group">
+    <label>Stock Mínimo (Alerta)</label>
+    <input
+        type="number"
+        value={formData.stockMin} // Antes stock_minimo
+        required
+        onChange={(e) => setFormData({ ...formData, stockMin: e.target.value })}
+    />
+</div>
+
+</div>
+
                             <div className="form-group">
 
                                 <label>Descripción</label>
@@ -369,24 +372,6 @@ export function DashboardProductos() {
                                             setFormData({
                                                 ...formData,
                                                 precio_venta: e.target.value
-                                            })
-                                        }
-                                    />
-
-                                </div>
-
-                                <div className="form-group">
-
-                                    <label>Stock</label>
-
-                                    <input
-                                        type="number"
-                                        value={formData.stock}
-                                        required
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                stock: e.target.value
                                             })
                                         }
                                     />

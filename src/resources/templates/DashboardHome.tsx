@@ -88,7 +88,7 @@ export function DashboardHome() {
               </div>
             </button>
 
-            <button className="module-card">
+            <button className="module-card" onClick={() => navigate("/DashboardPedidos")}>
               <div className="module-icon"><Truck size={32}/></div>
               <div className="module-info">
                 <h3>Pedidos</h3>

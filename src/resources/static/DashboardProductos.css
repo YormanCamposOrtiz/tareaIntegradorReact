@@ -417,6 +417,34 @@ tbody tr:last-child td {
   box-shadow: var(--shadow-hover);
 }
 
+
+/* Contenedor de la celda de imagen */
+.productos-full-content td:first-child {
+    width: 60px; /* Ancho fijo para la columna de imagen */
+}
+
+/* Estilo de la imagen miniatura */
+.img-tabla-mini {
+    width: 45px;
+    height: 45px;
+    object-fit: cover; /* Recorta la imagen para que llene el cuadrado sin deformarse */
+    border-radius: 8px; /* Bordes redondeados para que se vea moderno */
+    border: 1px solid #eee;
+    display: block;
+}
+
+/* Evitar que otras celdas se expandan demasiado */
+.table-wrapper table {
+    table-layout: fixed; /* Opcional: ayuda a que las columnas respeten el ancho */
+    width: 100%;
+}
+
+.table-wrapper th, .table-wrapper td {
+    overflow: hidden;
+    text-overflow: ellipsis; /* Si el nombre es muy largo, pone "..." */
+    white-space: nowrap;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */

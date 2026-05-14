@@ -54,7 +54,7 @@ export function Perfil() {
     navigate("/login");
   };
 
-  if (loading) return <div className="p-10 text-center text-orange-500 font-bold">Cargando perfil de MediExpress...</div>;
+
 
   return (
     <div className="perfil-container">
@@ -62,7 +62,7 @@ export function Perfil() {
       <Header />
 
         <br></br>
-      <main className="container mx-auto px-4 py-12">
+      <main className="perfil-main">
         <div className="max-w-4xl mx-auto">
           <div className="perfil-card">
             {/* Sección de cabecera del perfil */}

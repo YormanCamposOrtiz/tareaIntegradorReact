@@ -18,6 +18,7 @@ import { DashboardProductos } from './resources/templates/DashboardProductos';
 import { DashboardHome } from "./resources/templates/DashboardHome";
 import { DashboardVentas } from "./resources/templates/DashboardVentas";
 import { DashboardCompras } from "./resources/templates/DashboardCompras";
+import { DashboardPedidos} from "./resources/templates/DashboardPedidos";
 
 
 function App() {
@@ -41,7 +42,8 @@ function App() {
         <Route path="/DashboardVentas" element={<DashboardVentas />} />
         <Route path="/DashboardCompras" element={<DashboardCompras />} />
         <Route path="/DashboardProductos" element={<DashboardProductos />} />
-        
+        <Route path="/DashboardPedidos" element={<DashboardPedidos />} />
+
       </Routes>
     </BrowserRouter>
   );
