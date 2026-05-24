@@ -326,7 +326,7 @@
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.23);
 }
 
-/* Botón de Pagar Ahora */
+/* Botón de Continuar Compra */
 .btn-payment-now {
   width: 100%;
   background-color: #ff7a00; /* Naranja corporativo */
@@ -348,6 +348,33 @@
   background-color: #e06c00;
   transform: scale(1.02);
   box-shadow: 0 6px 20px rgba(255, 122, 0, 0.2);
+
+  /* Botón de Pagar */
+}
+.btn-final-pay {
+  width: 100%;
+  background-color: #ff7a00; /* El mismo naranja llamativo */
+  color: white;
+  border: none;
+  border-radius: 12px; /* Bordes redondeados idénticos */
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700; /* Letra idéntica en grosor */
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 6px rgba(255, 122, 0, 0.2); /* Sombra suave naranja */
+}
+
+/* Efecto al pasar el mouse por encima (Hover) */
+.btn-final-pay:hover {
+  background-color: #e66e00; /* Naranja un poco más oscuro al presionar */
+}
+
+/* Efecto de clic */
+.btn-final-pay:active {
+  transform: scale(0.98);
 }
 
 /* ==========================================================================
