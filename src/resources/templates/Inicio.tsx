@@ -77,7 +77,29 @@ const fetchDatos = async () => {
     return () => clearInterval(interval);
   }, [offers.length]);
 
+// --- NUEVA LÓGICA: AGREGAR AL CARRITO ---
+  const agregarAlCarrito = (producto: Producto) => {
+    const carritoActual = JSON.parse(localStorage.getItem("carrito_mediexpress") || "[]");
+    
+    const itemExistente = carritoActual.find((item: any) => item.id === producto.id);
 
+    if (itemExistente) {
+      itemExistente.cantidad += 1;
+    } else {
+      carritoActual.push({
+        id: producto.id,
+        nombre: producto.nombre,
+        descripcion: producto.descripcion || "Sin descripción disponible",
+        precio: producto.precio_venta,
+        imagen: producto.imagen || 'https://via.placeholder.com/150',
+        cantidad: 1
+      });
+    }
+
+    localStorage.setItem("carrito_mediexpress", JSON.stringify(carritoActual));
+    window.dispatchEvent(new Event("cartUpdate"));
+    alert(`${producto.nombre} agregado al carrito`);
+  };
 
 
   // --- LÓGICA DE FILTRADO ---
@@ -167,7 +189,7 @@ return (
                     </span>
                     <h4>{prod.nombre}</h4>
                     <p className="product-price">S/ {prod.precio_venta.toFixed(2)}</p>
-                    <button className="btn-add-cart">Agregar</button>
+                    <button className="btn-add-cart" onClick={() => agregarAlCarrito(prod)}> Agregar</button>
                   </div>
                 </div>
               ))
