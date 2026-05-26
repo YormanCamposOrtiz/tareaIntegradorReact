@@ -174,9 +174,6 @@ export function Carrito() {
               <div className="cart-action-buttons">
                 {paso === 'carrito' ? (
                   <>
-                    <button className="btn-payment-whatsapp">
-                      PEDIR POR WHATSAPP
-                    </button>
                     <button 
                       className="btn-payment-now" 
                       onClick={() => setPaso('checkout')}
