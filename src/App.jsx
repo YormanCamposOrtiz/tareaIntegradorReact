@@ -9,7 +9,6 @@ import { Carrito } from "./resources/templates/Carrito";
 import { Perfil } from "./resources/templates/Perfil";
 import { Registro } from "./resources/templates/Registro";
 import { RecuperarPassword } from "./resources/templates/RecuperarPassword";
-import { RestablecerPassword } from "./resources/templates/RestablecerPassword";
 import { RegistroAdmin } from "./resources/templates/RegistroAdmin";
 import { GestionUsuarios } from "./resources/templates/GestionUsuarios";
 
@@ -34,7 +33,6 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
-        <Route path="/restablecer" element={<RestablecerPassword />} />
         <Route path="/admin/registro" element={<RegistroAdmin />} />
         <Route path="/admin/gestion" element={<GestionUsuarios />} />
 
