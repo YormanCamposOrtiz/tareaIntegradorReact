@@ -81,7 +81,7 @@ export function DashboardCompras() {
             alert("Debes añadir al menos un producto al detalle de la compra.");
             return;
         }
-
+        
         // Estructura idéntica al modelo Compra.java
         const payloadCompra: Compra = {
             usuario: { id: 1 }, // ID del administrador logueado
@@ -254,7 +254,6 @@ export function DashboardCompras() {
         </div>
     );
 }
-
 // Estilos rápidos en línea para el modal
 const modalStyles = {
     overlay: { position: 'fixed' as const, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
