@@ -27,29 +27,47 @@ export function Login() {
       const response = await api.post('/auth/login', { correo, contrasena });
       const user = response.data;
 
-      // Si el login es exitoso
-      if (user.success) {
-        // --- GUARDAR EN LOCALSTORAGE ---
-        localStorage.setItem("userEmail", correo); //
-        localStorage.setItem("userRole", user.rol); //
+      console.log("CONSOLA DEPURACIÓN - Esto es lo que responde mi backend:", user);
 
-        if (user.rol === 'ADMINISTRADOR') {
-          navigate('/dashboardHome');
-        } else {
-          navigate('/');
+      // ... dentro de tu función handleSubmit en Login.tsx
+      if (user.success) {
+            // 1. Guardamos lo que ya tenemos
+        // Petición al backend
+              const response = await api.post('/auth/login', { correo, contrasena });
+              const user = response.data; // Ahora contiene { success: true, id: 2, ... }
+
+              if (user.success) {
+                // 1. Guardar datos en el localStorage
+                localStorage.setItem("userEmail", correo);
+                localStorage.setItem("userRole", user.rol);
+                
+                // 💡 AQUÍ ESTÁ EL TRUCO: Guardamos el ID que ahora envía tu LoginController modificado
+                if (user.id) {
+                  localStorage.setItem("userId", user.id.toString());
+                  console.log("✅ ID de usuario guardado con éxito en localStorage:", user.id);
+                } else {
+                  console.error("❌ Error: El backend sigue sin enviar el campo 'id'. Revisa si guardaste y reiniciaste Spring Boot.");
+                }
+
+                // 2. Redirección de roles
+                if (user.rol === 'ADMINISTRADOR') {
+                  navigate('/dashboardHome');
+                } else {
+                  navigate('/');
+                }
+              }
+          }
+        } catch (err: any) {
+          if (err.response) {
+            const status = err.response.status;
+            if (status === 403) alert("Cuenta bloqueada temporalmente.");
+            else if (status === 401) alert("Usuario o contraseña incorrectos.");
+            else alert("Error en el servidor.");
+          } else {
+            alert("No se pudo conectar con el servidor.");
+          }
         }
-      }
-    } catch (err: any) {
-      if (err.response) {
-        const status = err.response.status;
-        if (status === 403) alert("Cuenta bloqueada temporalmente.");
-        else if (status === 401) alert("Usuario o contraseña incorrectos.");
-        else alert("Error en el servidor.");
-      } else {
-        alert("No se pudo conectar con el servidor.");
-      }
-    }
-  };
+      };
 
 return (
     <div className="login-page-wrapper">
@@ -103,31 +121,31 @@ return (
             </div>
 
             {/* 4. CAMPO CONTRASEÑA */}
-<div>
-  <label className="login-label">Contraseña</label>
-  <div className="input-group relative"> {/* Añadimos relative para posicionar el ojo */}
-    <input
-      type={showPassword ? "text" : "password"} // <--- CAMBIO DINÁMICO
-      className="login-input pr-10" // pr-10 para que el texto no tape el ojo
-      placeholder="Ingresa tu contraseña"
-      value={credentials.contrasena}
-      onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })}
-      required
-    />
-    
-    {/* Icono de Candado (Izquierda) */}
-    <Lock className="input-icon" />
+            <div>
+              <label className="login-label">Contraseña</label>
+              <div className="input-group relative"> {/* Añadimos relative para posicionar el ojo */}
+                <input
+                  type={showPassword ? "text" : "password"} // <--- CAMBIO DINÁMICO
+                  className="login-input pr-10" // pr-10 para que el texto no tape el ojo
+                  placeholder="Ingresa tu contraseña"
+                  value={credentials.contrasena}
+                  onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })}
+                  required
+                />
+                
+                {/* Icono de Candado (Izquierda) */}
+                <Lock className="input-icon" />
 
-    {/* BOTÓN DEL OJITO (Derecha) */}
-    <button
-      type="button"
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
-      onClick={() => setShowPassword(!showPassword)}
-    >
-      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-    </button>
-  </div>
-</div>
+                {/* BOTÓN DEL OJITO (Derecha) */}
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
 
             <br></br>
             <div className="mt-2 text-sm text-gray-600">

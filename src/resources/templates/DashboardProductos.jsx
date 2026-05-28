@@ -186,46 +186,46 @@ const openModal = (prod = null) => {
 
                     <table>
 
-<thead>
-  <tr>
-    <th>Imagen</th>
-    <th>Producto</th>
-    <th>Categoría</th>
-    <th>Stock / Min</th>
-    <th>P. Venta</th>
-    <th className="text-center">Acciones</th>
-  </tr>
-</thead>
+                <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Stock / Min</th>
+                    <th>P. Venta</th>
+                    <th className="text-center">Acciones</th>
+                </tr>
+                </thead>
 
-<tbody>
-    {productos.map((prod) => (
-        <tr key={prod.id} style={{ opacity: prod.visibilidad ? 1 : 0.5 }}>
-            <td>
-                <img 
-                   src={prod.imagen || 'https://via.placeholder.com/50'} // Antes imagen_url
-                     alt={prod.nombre} 
-                    className="img-tabla-mini" 
-                />
-            </td>
-            <td className="text-bold">
-                {prod.nombre}
-                {!prod.visibilidad && <span className="badge-oculto"> (Oculto)</span>}
-            </td>
-            <td>{prod.categoria?.emoji} {prod.categoria?.nombre}</td>
+                <tbody>
+                    {productos.map((prod) => (
+                        <tr key={prod.id} style={{ opacity: prod.visibilidad ? 1 : 0.5 }}>
+                            <td>
+                                <img 
+                                src={prod.imagen || 'https://via.placeholder.com/50'} // Antes imagen_url
+                                    alt={prod.nombre} 
+                                    className="img-tabla-mini" 
+                                />
+                            </td>
+                            <td className="text-bold">
+                                {prod.nombre}
+                                {!prod.visibilidad && <span className="badge-oculto"> (Oculto)</span>}
+                            </td>
+                            <td>{prod.categoria?.emoji} {prod.categoria?.nombre}</td>
 
-<           td className={prod.stock <= prod.stockMin ? "low-stock" : ""}>
-              {prod.stock} / <small>{prod.stockMin}</small>
-           </td>
-            <td className="text-price">s/{prod.precio_venta}</td>
-            <td className="actions-cell">
-                <button onClick={() => openModal(prod)} className="btn-icon-edit"><Edit size={18} /></button>
-                <button onClick={() => handleDelete(prod.id)} className="btn-icon-delete">
-                    {prod.visibilidad ? <Trash2 size={18} /> : <Eye size={18} />}
-                </button>
-            </td>
-        </tr>
-    ))}
-</tbody>
+                <           td className={prod.stock <= prod.stockMin ? "low-stock" : ""}>
+                            {prod.stock} / <small>{prod.stockMin}</small>
+                        </td>
+                            <td className="text-price">s/{prod.precio_venta}</td>
+                            <td className="actions-cell">
+                                <button onClick={() => openModal(prod)} className="btn-icon-edit"><Edit size={18} /></button>
+                                <button onClick={() => handleDelete(prod.id)} className="btn-icon-delete">
+                                    {prod.visibilidad ? <Trash2 size={18} /> : <Eye size={18} />}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
 
                     </table>
 
@@ -286,40 +286,40 @@ const openModal = (prod = null) => {
                             </div>
 
                             {/* Campo para Imagen URL */}
-<div className="form-group">
-    <label>URL de la Imagen</label>
-    <input
-        type="text"
-        placeholder="https://..."
-        value={formData.imagen} // Antes imagen_url
-        onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
-    />
-</div>
+                            <div className="form-group">
+                                <label>URL de la Imagen</label>
+                                <input
+                                    type="text"
+                                    placeholder="https://..."
+                                    value={formData.imagen} // Antes imagen_url
+                                    onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
+                                />
+                            </div>
 
-<div className="form-row">
-    {/* Campo Stock Actual */}
-    <div className="form-group">
-        <label>Stock Actual</label>
-        <input
-            type="number"
-            value={formData.stock}
-            required
-            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-        />
-    </div>
-    
-    {/* NUEVO: Campo Stock Mínimo */}
-<div className="form-group">
-    <label>Stock Mínimo (Alerta)</label>
-    <input
-        type="number"
-        value={formData.stockMin} // Antes stock_minimo
-        required
-        onChange={(e) => setFormData({ ...formData, stockMin: e.target.value })}
-    />
-</div>
+                            <div className="form-row">
+                                {/* Campo Stock Actual */}
+                                <div className="form-group">
+                                    <label>Stock Actual</label>
+                                    <input
+                                        type="number"
+                                        value={formData.stock}
+                                        required
+                                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                                    />
+                                </div>
+                                
+                                {/* NUEVO: Campo Stock Mínimo */}
+                            <div className="form-group">
+                                <label>Stock Mínimo (Alerta)</label>
+                                <input
+                                    type="number"
+                                    value={formData.stockMin} // Antes stock_minimo
+                                    required
+                                    onChange={(e) => setFormData({ ...formData, stockMin: e.target.value })}
+                                />
+                            </div>
 
-</div>
+                            </div>
 
                             <div className="form-group">
 
