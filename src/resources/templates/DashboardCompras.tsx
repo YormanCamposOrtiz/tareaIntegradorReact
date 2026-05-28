@@ -205,7 +205,6 @@ export function DashboardCompras() {
                         📦 Nueva Compra
                     </button>
                     <button className="btn-anular">Anular Compra</button>
-                    <button className="btn-actualizar" onClick={fetchDatos}>Actualizar</button>
                     <div className="filter-group">
                         <label>Desde:</label>
                         <input type="date" />

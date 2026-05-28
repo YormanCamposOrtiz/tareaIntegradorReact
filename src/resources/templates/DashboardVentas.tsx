@@ -192,7 +192,6 @@ export function DashboardVentas() {
                         📦 Nueva Venta
                     </button>
                     <button className="btn-anular">Anular Venta</button>
-                    <button className="btn-actualizar" onClick={fetchDatos}>Actualizar</button>
                     <div className="filter-group">
                         <label>Desde:</label>
                         <input type="date" />
