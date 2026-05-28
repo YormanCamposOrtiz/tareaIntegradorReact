@@ -1,0 +1,74 @@
+/* Layout similar al de tu Dashboard de Compras */
+.pedidos-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.pedidos-content {
+    display: flex;
+    flex: 1;
+}
+
+.pedidos-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid #ddd;
+}
+
+.pedidos-main {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+/* Estilos de Tabla Naranja (como image_575a76.png) */
+.table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-wrapper th {
+    background-color: #ff7300;
+    color: white;
+    padding: 12px;
+    text-transform: uppercase;
+}
+
+.table-wrapper td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.total-text {
+    color: #28a745;
+    font-weight: bold;
+}
+
+/* Badges de Estado */
+.badge-status {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+}
+
+.entregado { background-color: #d4edda; color: #155724; }
+.en-proceso { background-color: #fff3cd; color: #856404; }
+.pendiente { background-color: #f8d7da; color: #721c24; }
+
+/* Botones Sidebar */
+.pedidos-sidebar button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-nuevo { background-color: #ff7300; color: white; }
+.btn-cerrar { background-color: #6c757d; color: white; }
