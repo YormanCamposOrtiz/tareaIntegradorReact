@@ -99,10 +99,14 @@ export function DashboardCompras() {
             if (response.ok) {
                 alert("¡Compra e ingreso de stock registrados correctamente!");
                 setMostrarModal(false);
-                // Resetear el formulario temporal
+                // RESETEAR TODO EL ESTADO PARA LA PRÓXIMA COMPRA
                 setProveedor('');
                 setDetallesNuevaCompra([]);
-                // Recargar la tabla del historial con los nuevos datos actualizados
+                setIdProductoInput('');
+                setCantidadInput(1);
+                setPrecioInput(0.0);
+                
+                // Recargar la tabla
                 listarCompras();
             } else {
                 const errorText = await response.text();
