@@ -1,122 +1,199 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardHeader } from './fragments/DashboardHeader';
-import "../static/DashboardMovimiento.css";
 
+import "../static/DashboardMovimiento.css";
+import api from "../../api"; 
+
+
+// ================= INTERFACES SINCRONIZADAS =================
 interface DetalleCompra {
     id?: number;
-    producto: { id: number; nombre?: string };
     cantidad: number;
     precioCompra: number;
-    subtotal?: number;
+    subtotal: number;
+    producto?: {
+        id: number;
+        nombre: string;
+    };
 }
 
 interface Compra {
-    id?: number; // Sincronizado con 'id' de Compra.java
-    usuario: { id: number; nombre?: string } | null; // Sincronizado con tu entidad Usuario
+    id: number; 
+    usuario?: {
+        id: number;
+        username?: string; 
+        nombre?: string;
+    } | null;
+    fecha: string;
     proveedor: string;
-    fecha?: string;
-    total?: number;
-    detalles: DetalleCompra[];
+    total: number;
+    detalles?: DetalleCompra[]; 
+}
+
+interface Categoria {
+    id: number;
+    nombre: string;
+    emoji?: string;
+}
+
+interface Producto {
+    id: number;
+    nombre: string;
+    descripcion?: string;
+    precio_venta: number;
+    stock: number;
+    categoria?: Categoria;
+}
+
+interface ItemCarritoCompra {
+    id: number;
+    nombre: string;
+    cantidad: number;
+    precioCosto: number; // Precio al que le compramos al proveedor
+    subTotal: number;
 }
 
 export function DashboardCompras() {
     const navigate = useNavigate();
-    const [compras, setCompras] = useState<Compra[]>([]); // Cambiado de any[] a Compra[] para mejor control
+    
+    // Estados de datos de la API
+    const [compras, setCompras] = useState<Compra[]>([]);
+    const [productos, setProductos] = useState<Producto[]>([]);
+    
+    // Guarda la compra seleccionada para ver el desglose en la tabla inferior
     const [compraSeleccionada, setCompraSeleccionada] = useState<Compra | null>(null);
     
-    // --- ESTADOS PARA EL INGRESO DE NUEVA COMPRA ---
-    const [mostrarModal, setMostrarModal] = useState(false);
+    // Estados del modal de registro de compras (Ingreso de Mercadería)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [busqueda, setBusqueda] = useState('');
     const [proveedor, setProveedor] = useState('');
-    const [idProductoInput, setIdProductoInput] = useState('');
-    const [cantidadInput, setCantidadInput] = useState(1);
-    const [precioInput, setPrecioInput] = useState(0.0);
-    const [detallesNuevaCompra, setDetallesNuevaCompra] = useState<DetalleCompra[]>([]);
+    const [carrito, setCarrito] = useState<ItemCarritoCompra[]>([]);
 
     useEffect(() => {
-        listarCompras();
+        fetchDatos();
     }, []);
 
-    const listarCompras = async () => {
+    const fetchDatos = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/compras");
-            if (response.ok) {
-                const data = await response.json();
-                setCompras(data);
-            }
+            // Cargamos productos para el buscador interactivo del modal
+            const prodResponse = await api.get('/productos');
+            setProductos(prodResponse.data);
+            
+            // Cargamos el historial de compras desde Spring Boot
+            const comprasResponse = await api.get('/compras');
+            setCompras(comprasResponse.data);
+            
+            // Limpiar la selección activa para evitar datos desfasados en pantalla
+            setCompraSeleccionada(null);
         } catch (error) {
-            console.error("Error al conectar con la API de compras:", error);
+            console.error("Error al cargar datos desde Spring Boot:", error);
         }
     };
 
-    // Agregar un producto a la lista temporal del detalle de la compra
-    const agregarItemTemporal = () => {
-        if (!idProductoInput || cantidadInput <= 0 || precioInput <= 0) {
-            alert("Por favor, ingresa un ID de producto, cantidad y precio válidos.");
-            return;
+    const agregarAlCarrito = (prod: Producto) => {
+        const existe = carrito.find(item => item.id === prod.id);
+        if (existe) {
+            // En compras no hay límite de stock máximo (estamos abasteciendo el negocio)
+            cambiarCantidad(prod.id, existe.cantidad + 1);
+        } else {
+            setCarrito([...carrito, {
+                id: prod.id,
+                nombre: prod.nombre,
+                cantidad: 1,
+                precioCosto: 0.0, // Se inicializa en 0 para que el usuario digite el costo real del proveedor
+                subTotal: 0.0
+            }]);
         }
-
-        const nuevoItem: DetalleCompra = {
-            producto: { id: parseInt(idProductoInput) },
-            cantidad: cantidadInput,
-            precioCompra: precioInput
-        };
-
-        setDetallesNuevaCompra([...detallesNuevaCompra, nuevoItem]);
-        // Limpiar inputs del producto para el siguiente
-        setIdProductoInput('');
-        setCantidadInput(1);
-        setPrecioInput(0.0);
+        setBusqueda(''); 
     };
 
-    // Enviar la estructura final JSON a tu Spring Boot CompraController
-    const guardarNuevaCompra = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const cambiarCantidad = (id: number, nuevaCantidad: number) => {
+        if (nuevaCantidad < 1) return; 
 
-        if (!proveedor.trim()) {
-            alert("El nombre del proveedor es obligatorio.");
-            return;
-        }
-        if (detallesNuevaCompra.length === 0) {
-            alert("Debes añadir al menos un producto al detalle de la compra.");
-            return;
-        }
-        
-        // Estructura idéntica al modelo Compra.java
-        const payloadCompra: Compra = {
-            usuario: { id: 1 }, // ID del administrador logueado
-            proveedor: proveedor,
-            detalles: detallesNuevaCompra
-        };
+        setCarrito(carrito.map(item => 
+            item.id === id 
+                ? { ...item, cantidad: nuevaCantidad, subTotal: nuevaCantidad * item.precioCosto }
+                : item
+        ));
+    };
 
+    const cambiarPrecioCosto = (id: number, nuevoPrecio: number) => {
+        if (nuevoPrecio < 0) return;
+
+        setCarrito(carrito.map(item => 
+            item.id === id 
+                ? { ...item, precioCosto: nuevoPrecio, subTotal: item.cantidad * nuevoPrecio }
+                : item
+        ));
+    };
+
+    const eliminarDelCarrito = (id: number) => {
+        setCarrito(carrito.filter(item => item.id !== id));
+    };
+
+    // Calcula la inversión/total general del lote de mercadería
+    const totalGeneral = carrito.reduce((sum, item) => sum + item.subTotal, 0);
+
+    const handleSaveCompra = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/compras", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payloadCompra)
-            });
+            const loggedInUserId = localStorage.getItem("userId");
+            
+            if (!loggedInUserId) {
+                alert("No se detectó una sesión activa de usuario. Por favor, vuelva a iniciar sesión.");
+                return;
+            }
+            if (!proveedor.trim()) {
+                alert("Por favor, ingrese el nombre del proveedor o distribuidor.");
+                return;
+            }
 
-            if (response.ok) {
-                alert("¡Compra e ingreso de stock registrados correctamente!");
-                setMostrarModal(false);
-                // RESETEAR TODO EL ESTADO PARA LA PRÓXIMA COMPRA
+            const ahora = new Date();
+            const fechaFormateada = ahora.toISOString().split('.')[0]; 
+
+            // Estructura limpia que espera recibir tu DTO / Entidad en Spring Boot
+            const detallesCompra = carrito.map(item => ({
+                cantidad: item.cantidad,
+                precioCompra: item.precioCosto,
+                subtotal: item.subTotal,
+                producto: {
+                    id: item.id 
+                }
+            }));
+
+            const nuevaCompra = {
+                fecha: fechaFormateada,
+                proveedor: proveedor,
+                total: totalGeneral,
+                usuario: {
+                    id: parseInt(loggedInUserId, 10)
+                },
+                detalles: detallesCompra 
+            };
+
+            const response = await api.post('/compras', nuevaCompra);
+            
+            if (response.status === 200 || response.status === 201) {
+                alert("¡Compra e ingreso de stock registrados con éxito!");
+                setCarrito([]);        
                 setProveedor('');
-                setDetallesNuevaCompra([]);
-                setIdProductoInput('');
-                setCantidadInput(1);
-                setPrecioInput(0.0);
-                
-                // Recargar la tabla
-                listarCompras();
-            } else {
-                const errorText = await response.text();
-                alert("Error al procesar la compra: " + errorText);
+                setIsModalOpen(false);  
+                fetchDatos(); // Refresca las tablas automáticamente         
             }
-        } catch (error) {
-            console.error("Error de red:", error);
-            alert("No se pudo conectar con el servidor backend.");
+
+        } catch (err: any) {
+            console.error("Error al registrar la compra:", err);
+            if (err.response && err.response.data) {
+                alert(`Error en el servidor: ${err.response.data.detail || 'Verifique los datos de la compra.'}`);
+            } else {
+                alert("Hubo un problema de conexión al registrar la compra.");
+            }
         }
     };
+
+    const productosFiltrados = busqueda === '' ? [] : productos.filter(p => 
+        p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    );
 
     return (
         <div className="compras-container">
@@ -124,12 +201,11 @@ export function DashboardCompras() {
 
             <div className="compras-content">
                 <aside className="compras-sidebar">
-                    {/* BOTÓN DISPARADOR DE REGISTRO */}
-                    <button className="btn-actualizar" style={{backgroundColor: '#28a745', color: 'white'}} onClick={() => setMostrarModal(true)}>
-                        + Nueva Compra
+                    <button className="btn-actualizar" style={{backgroundColor: '#27ae60', color: 'white'}} onClick={() => setIsModalOpen(true)}>
+                        📦 Nueva Compra
                     </button>
                     <button className="btn-anular">Anular Compra</button>
-                    <button className="btn-actualizar" onClick={listarCompras}>Actualizar</button>
+                    <button className="btn-actualizar" onClick={fetchDatos}>Actualizar</button>
                     <div className="filter-group">
                         <label>Desde:</label>
                         <input type="date" />
@@ -137,60 +213,95 @@ export function DashboardCompras() {
                         <input type="date" />
                     </div>
                     <button className="btn-buscar">Buscar</button>
+                    <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
                 <main className="compras-main">
-                    {/* Historial General */}
+                    {/* TABLA PRINCIPAL: HISTORIAL DE COMPRAS */}
                     <div className="table-wrapper">
                         <h3>Historial de Órdenes de Compra</h3>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>ID Compra</th>
+                                    <th>ID_Compra</th>
                                     <th>Proveedor</th>
-                                    <th>Fecha</th>
-                                    <th>Total</th>
+                                    <th>Recibido por</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Total Invertido</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {compras.map((c) => (
-                                    <tr key={c.id} onClick={() => setCompraSeleccionada(c)} style={{cursor:'pointer'}}>
-                                        <td>#{c.id}</td> {/* Mapeado correctamente a .id */}
-                                        <td>{c.proveedor}</td>
-                                        <td>{c.fecha ? new Date(c.fecha).toLocaleString() : '---'}</td>
-                                        <td>S/ {c.total?.toFixed(2)}</td>
+                                {compras.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} style={{ textAlign: 'center', padding: '10px' }}>No hay compras registradas en el sistema.</td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    compras.map(c => {
+                                        const isSelected = compraSeleccionada?.id === c.id;
+                                        return (
+                                            <tr 
+                                                key={c.id} 
+                                                onClick={() => setCompraSeleccionada(c)}
+                                                style={{ 
+                                                    cursor: 'pointer', 
+                                                    backgroundColor: isSelected ? '#ebf5fb' : '',
+                                                    fontWeight: isSelected ? 'bold' : 'normal'
+                                                }}
+                                                className={isSelected ? "fila-seleccionada" : ""}
+                                            >
+                                                <td>{String(c.id).padStart(3, '0')}</td>
+                                                <td style={{ fontWeight: '500' }}>{c.proveedor}</td>
+                                                <td>{c.usuario?.nombre || c.usuario?.username || 'Administrador'}</td>
+                                                <td>{c.fecha ? new Date(c.fecha).toLocaleString() : 'Fecha no registrada'}</td>
+                                                <td style={{ fontWeight: 'bold', color: '#2980b9' }}>
+                                                    S/. {(c.total || 0).toFixed(2)}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Detalle */}
+                    
+                    {/* TABLA INFERIOR: DETALLES DE LA COMPRA SELECCIONADA */}
                     <div className="table-wrapper" style={{ marginTop: '20px' }}>
-                        <h3>Detalle de la Compra Seleccionada</h3>
+                        <h3>
+                            {compraSeleccionada 
+                                ? `Artículos de la Orden de Compra #${String(compraSeleccionada.id).padStart(3, '0')}` 
+                                : "Seleccione una orden de compra para ver sus artículos"}
+                        </h3>
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Producto ID</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Compra</th>
+                                    <th>Nombre del Producto</th>
+                                    <th>Cantidad Ingresada</th>
+                                    <th>Costo Compra Unitario</th>
                                     <th>Sub Total</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {compraSeleccionada?.detalles && compraSeleccionada.detalles.length > 0 ? (
-                                    compraSeleccionada.detalles.map((d) => (
-                                        <tr key={d.id || d.producto.id}>
-                                            <td>ID: {d.producto.id}</td>
+                                {!compraSeleccionada ? (
+                                    <tr>
+                                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#7f8c8d' }}>
+                                            Ninguna orden de compra seleccionada en la tabla superior.
+                                        </td>
+                                    </tr>
+                                ) : !compraSeleccionada.detalles || compraSeleccionada.detalles.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#e74c3c' }}>
+                                            Esta compra no contiene desglose de artículos en el sistema.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    compraSeleccionada.detalles.map((d, index) => (
+                                        <tr key={d.id || index}>
+                                            <td>{d.producto?.nombre || `Producto ID: ${d.producto?.id || 'Desconocido'}`}</td>
                                             <td>{d.cantidad} u.</td>
-                                            <td>S/ {d.precioCompra.toFixed(2)}</td>
-                                            <td>S/ {d.subtotal ? d.subtotal.toFixed(2) : (d.cantidad * d.precioCompra).toFixed(2)}</td>
+                                            <td>S/. {(d.precioCompra || 0).toFixed(2)}</td>
+                                            <td style={{ fontWeight: 'bold' }}>S/. {(d.subtotal || 0).toFixed(2)}</td>
                                         </tr>
                                     ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={4} style={{textAlign: 'center', color: '#888'}}>Selecciona una compra para ver sus artículos</td>
-                                    </tr>
                                 )}
                             </tbody>
                         </table>
@@ -198,70 +309,127 @@ export function DashboardCompras() {
                 </main>
             </div>
 
-            {/* --- INTERFAZ INTERNA MODAL DE REGISTRO --- */}
-            {mostrarModal && (
-                <div className="modal-overlay" style={modalStyles.overlay}>
-                    <div className="modal-body" style={modalStyles.body}>
-                        <h2>Registrar Ingreso de Mercadería (Compra)</h2>
-                        <form onSubmit={guardarNuevaCompra}>
-                            <div style={{marginBottom: '15px'}}>
-                                <label style={{display: 'block'}}>Proveedor:</label>
-                                <input 
-                                    type="text" 
-                                    value={proveedor} 
-                                    onChange={(e) => setProveedor(e.target.value)} 
-                                    placeholder="Ej. Distribuidora Tecnológica SAC"
-                                    style={modalStyles.input}
-                                />
-                            </div>
+            {/* ================= MODAL DE REGISTRO DE COMPRA ================= */}
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>📦 Registro e Ingreso de Mercadería</h2>
+                        <hr />
 
-                            <fieldset style={{border: '1px solid #ddd', padding: '10px', marginBottom: '15px'}}>
-                                <legend>Agregar Artículos al Inventario</legend>
-                                <div style={{display: 'flex', gap: '10px', alignItems: 'flex-end'}}>
-                                    <div>
-                                        <label style={{fontSize: '12px'}}>ID Producto:</label>
-                                        <input type="number" value={idProductoInput} onChange={(e) => setIdProductoInput(e.target.value)} style={modalStyles.inputCompact}/>
-                                    </div>
-                                    <div>
-                                        <label style={{fontSize: '12px'}}>Cantidad:</label>
-                                        <input type="number" value={cantidadInput} onChange={(e) => setCantidadInput(parseInt(e.target.value) || 0)} style={modalStyles.inputCompact}/>
-                                    </div>
-                                    <div>
-                                        <label style={{fontSize: '12px'}}>P. Compra Unitario (S/):</label>
-                                        <input type="number" step="0.01" value={precioInput} onChange={(e) => setPrecioInput(parseFloat(e.target.value) || 0.0)} style={modalStyles.inputCompact}/>
-                                    </div>
-                                    <button type="button" onClick={agregarItemTemporal} style={{padding: '6px 12px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px'}}>
-                                        + Añadir
-                                    </button>
-                                </div>
+                        {/* INPUT PARA DATOS DEL PROVEEDOR */}
+                        <div style={{ marginBottom: '15px' }}>
+                            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>🏢 Proveedor / Distribuidor:</label>
+                            <input 
+                                type="text"
+                                placeholder="Ej. Novatech Distribuciones S.A.C."
+                                value={proveedor}
+                                onChange={(e) => setProveedor(e.target.value)}
+                                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #bdc3c7' }}
+                            />
+                        </div>
 
-                                {/* Previsualización de los productos agregados a la lista actual de compras */}
-                                <ul style={{marginTop: '10px', fontSize: '13px', maxHeight: '100px', overflowY: 'auto'}}>
-                                    {detallesNuevaCompra.map((item, index) => (
-                                        <li key={index}>📦 Prod ID: {item.producto.id} — Cantidad: {item.cantidad} u. — Costo U: S/ {item.precioCompra.toFixed(2)}</li>
+                        {/* BUSCADOR INTERACTIVO DE PRODUCTOS EXISTENTES */}
+                        <div className="modal-buscador-container">
+                            <label style={{ fontWeight: 'bold' }}>💻 Buscar Producto a Abastecer:</label>
+                            <input 
+                                type="text" 
+                                placeholder="Escriba el nombre del artículo para añadirlo..." 
+                                value={busqueda}
+                                onChange={(e) => setBusqueda(e.target.value)}
+                                className="modal-input-buscar"
+                            />
+                            
+                            {productosFiltrados.length > 0 && (
+                                <ul className="modal-resultados-busqueda">
+                                    {productosFiltrados.map(prod => (
+                                        <li key={prod.id} onClick={() => agregarAlCarrito(prod)}>
+                                            {prod.nombre} (Stock actual: {prod.stock}) - S/. {prod.precio_venta.toFixed(2)} ➕
+                                        </li>
                                     ))}
                                 </ul>
-                            </fieldset>
+                            )}
+                        </div>
 
-                            <div style={{display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
-                                <button type="button" onClick={() => setMostrarModal(false)} style={{padding: '8px 15px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px'}}>
-                                    Cancelar
-                                </button>
-                                <button type="submit" style={{padding: '8px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px'}}>
-                                    Guardar e Incrementar Stock
-                                </button>
+                        {/* LISTA DEL LOTE ACTUAL DE LA COMPRA */}
+                        <div className="modal-table-wrapper">
+                            <table className="modal-tabla">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: '40%' }}>Producto</th>
+                                        <th style={{ width: '20%' }}>Cantidad</th>
+                                        <th style={{ width: '20%' }}>Costo Compra (S/.)</th>
+                                        <th style={{ width: '15%' }}>Subtotal</th>
+                                        <th style={{ width: '5%' }}></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {carrito.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={5} style={{textAlign: 'center', color: '#95a5a6', padding: '20px'}}>
+                                                La lista de reabastecimiento está vacía. Busque productos arriba.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        carrito.map(item => (
+                                            <tr key={item.id}>
+                                                <td><strong>{item.nombre}</strong></td>
+                                                <td>
+                                                    <input 
+                                                        type="number" 
+                                                        value={item.cantidad} 
+                                                        min="1"
+                                                        onChange={(e) => cambiarCantidad(item.id, parseInt(e.target.value) || 1)}
+                                                        style={{ width: '65px', padding: '5px', textAlign: 'center', borderRadius: '4px', border: '1px solid #bdc3c7' }}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input 
+                                                        type="number" 
+                                                        step="0.01"
+                                                        min="0"
+                                                        placeholder="0.00"
+                                                        value={item.precioCosto || ''} 
+                                                        onChange={(e) => cambiarPrecioCosto(item.id, parseFloat(e.target.value) || 0)}
+                                                        style={{ width: '85px', padding: '5px', textAlign: 'right', borderRadius: '4px', border: '1px solid #bdc3c7' }}
+                                                    />
+                                                </td>
+                                                <td>S/. {item.subTotal.toFixed(2)}</td>
+                                                <td>
+                                                    <button type="button" className="btn-eliminar-item" onClick={() => eliminarDelCarrito(item.id)}>❌</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* SECCIÓN DE TOTALES */}
+                        <div className="modal-totales-seccion">
+                            <div className="total-row">
+                                <span>TOTAL INVERSIÓN GENERAL:</span>
+                                <strong className="total-precio" style={{ color: '#2980b9' }}>S/. {totalGeneral.toFixed(2)}</strong>
                             </div>
-                        </form>
+                        </div>
+
+                        {/* ACCIONES DEL MODAL */}
+                        <div className="modal-acciones">
+                            <button type="button" className="btn-modal-cancelar" onClick={() => { setIsModalOpen(false); setCarrito([]); setProveedor(''); }}>
+                                Cancelar Registro
+                            </button>
+                            <button 
+                                type="button"
+                                className="btn-modal-registrar" 
+                                style={{ backgroundColor: '#2980b9' }}
+                                onClick={handleSaveCompra}
+                                disabled={carrito.length === 0 || !proveedor.trim()}
+                            >
+                                Guardar e Incrementar Stock
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
         </div>
     );
 }
-// Estilos rápidos en línea para el modal
-const modalStyles = {
-    overlay: { position: 'fixed' as const, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-    body: { backgroundColor: 'white', padding: '25px', borderRadius: '8px', width: '550px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' },
-    input: { width: '100%', padding: '8px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc' },
-    inputCompact: { width: '90px', padding: '6px', marginTop: '5px', borderRadius: '4px', border: '1px solid #ccc' }
-};
