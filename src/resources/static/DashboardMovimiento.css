@@ -1,11 +1,11 @@
 /* Contenedor Principal */
 .ventas-container {
-    height: 100vh;
+    min-height: 100vh;
     background-color: #fcf6f4; /* Un tono crema/rojizo extremadamente sutil y limpio */
     display: flex;
     flex-direction: column;
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
-    overflow: hidden;
+    overflow: auto;
     color: #2c3e50;
 }
 
@@ -422,12 +422,12 @@ thead th:last-child { border-top-right-radius: 8px; }
 
 /* Contenedor Principal */
 .compras-container {
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f4f7f6; /* Fondo gris/clínico limpio con un sutil toque verdoso */
     display: flex;
     flex-direction: column;
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
-    overflow: hidden;
+    overflow: auto;
     color: #2c3e50;
 }
 
