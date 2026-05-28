@@ -48,16 +48,17 @@ export function Perfil() {
       });
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("userEmail"); //[cite: 2]
-    localStorage.removeItem("userRole"); //
-    navigate("/login");
-  };
+    const handleLogout = () => {
+      localStorage.removeItem("userEmail"); //[cite: 2]
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userId"); // 👈 Agrega esto para limpiar el ID al cerrar sesión
+      navigate("/login");
+    };
 
 
 
   return (
-    <div className="perfil-container">
+    <div className="login-page-wrapper">
       
       <Header />
 

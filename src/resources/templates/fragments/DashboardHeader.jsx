@@ -17,12 +17,25 @@ export function DashboardHeader() {
     }, []);
 
     const handleLogout = () => {
-        if (window.confirm("¿Cerrar sesión?")) {
-            // Aquí puedes limpiar tokens de localStorage si los usas
+        if (window.confirm("¿Seguro que deseas cerrar sesión?")) {
+        // 1. Limpiamos las llaves EXACTAS que guarda tu Login.tsx
+            localStorage.removeItem('userEmail'); 
+            localStorage.removeItem('userRole'); 
+            localStorage.removeItem('userId'); 
+        
+        // Por si acaso quedaron residuos en sessionStorage
+            sessionStorage.removeItem('userEmail');
+            sessionStorage.removeItem('userRole');
+            sessionStorage.removeItem('userId');
+
+        // 2. Volvemos a la página principal totalmente limpios
             navigate('/'); 
+
+        // 3. Forzamos el refresco para limpiar los estados de React
+            window.location.reload();
         }
     };
-
+    
     return (
         <header className="admin-header">
             <div className="header-brand">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardHeader } from './fragments/DashboardHeader';
-import "../static/DashboardCompras.css";
+import "../static/DashboardMovimiento.css";
 
 interface DetalleCompra {
     id?: number;
