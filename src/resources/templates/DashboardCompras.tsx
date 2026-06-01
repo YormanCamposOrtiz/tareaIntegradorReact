@@ -70,25 +70,50 @@ export function DashboardCompras() {
     const [proveedor, setProveedor] = useState('');
     const [carrito, setCarrito] = useState<ItemCarritoCompra[]>([]);
 
+    const [fechaDesde, setFechaDesde] = useState('');
+    const [fechaHasta, setFechaHasta] = useState('');
+
     useEffect(() => {
         fetchDatos();
     }, []);
 
-    const fetchDatos = async () => {
-        try {
-            // Cargamos productos para el buscador interactivo del modal
-            const prodResponse = await api.get('/productos');
-            setProductos(prodResponse.data);
-            
-            // Cargamos el historial de compras desde Spring Boot
-            const comprasResponse = await api.get('/compras');
-            setCompras(comprasResponse.data);
-            
-            // Limpiar la selección activa para evitar datos desfasados en pantalla
-            setCompraSeleccionada(null);
-        } catch (error) {
-            console.error("Error al cargar datos desde Spring Boot:", error);
+    const fetchDatos = async (desde?: string, hasta?: string) => {
+    try {
+        const prodResponse = await api.get('/productos');
+        setProductos(prodResponse.data);
+        
+        // Construir la URL dinámicamente si hay filtros de fecha
+        let url = '/compras';
+        if (desde && hasta) {
+            url += `?inicio=${desde}&fin=${hasta}`;
         }
+        
+        const comprasResponse = await api.get(url);
+        setCompras(comprasResponse.data);
+        setCompraSeleccionada(null);
+    } catch (error) {
+        console.error("Error al cargar datos desde Spring Boot:", error);
+    }
+    };
+
+    // Función para el botón "Buscar"
+    const handleBuscarPorFechas = () => {
+        if (!fechaDesde || !fechaHasta) {
+            alert("Por favor, seleccione ambas fechas para realizar el filtro.");
+            return;
+        }
+        if (new Date(fechaDesde) > new Date(fechaHasta)) {
+            alert("La fecha de inicio ('Desde') no puede ser mayor que la fecha final ('Hasta').");
+            return;
+        }
+        fetchDatos(fechaDesde, fechaHasta);
+    };
+
+    // Opcional: Un botón para limpiar el filtro si lo deseas
+    const handleLimpiarFiltro = () => {
+        setFechaDesde('');
+        setFechaHasta('');
+        fetchDatos(); // Vuelve a cargar todas las compras
     };
 
     const agregarAlCarrito = (prod: Producto) => {
@@ -190,6 +215,35 @@ export function DashboardCompras() {
             }
         }
     };
+    const handleEliminarCompra = async () => {
+        if (!compraSeleccionada) {
+            alert("Por favor, seleccione una orden de compra de la tabla primero.");
+            return;
+        }
+
+        const confirmar = window.confirm(
+            `¿Está completamente seguro de anular la Compra #${String(compraSeleccionada.id).padStart(3, '0')}?\n` +
+            `Esta acción RESTARÁ el stock de los productos ingresados de forma permanente.`
+        );
+
+        if (!confirmar) return;
+
+        try {
+            const response = await api.delete(`/compras/${compraSeleccionada.id}`);
+            
+            if (response.status === 200) {
+                alert("¡Compra anulada y stock revertido con éxito!");
+                fetchDatos(); // Refresca las tablas y limpia la selección
+            }
+        } catch (err: any) {
+            console.error("Error al eliminar la compra:", err);
+            if (err.response && err.response.data) {
+                alert(`Error en el servidor: ${err.response.data}`);
+            } else {
+                alert("Hubo un problema de conexión al intentar eliminar la compra.");
+            }
+        }
+    };
 
     const productosFiltrados = busqueda === '' ? [] : productos.filter(p => 
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
@@ -204,14 +258,45 @@ export function DashboardCompras() {
                     <button className="btn-actualizar" style={{backgroundColor: '#27ae60', color: 'white'}} onClick={() => setIsModalOpen(true)}>
                         📦 Nueva Compra
                     </button>
-                    <button className="btn-anular">Anular Compra</button>
+                    <button className="btn-anular" 
+                        onClick={handleEliminarCompra}
+                        style={{
+                            backgroundColor: compraSeleccionada ? '#e74c3c' : '#95a5a6', 
+                            color: 'white',
+                            cursor: compraSeleccionada ? 'pointer' : 'not-allowed'
+                        }}
+                        disabled={!compraSeleccionada}
+                    >Anular Compra</button>
+                    
+                    {/* ZONA DEL FILTRO ACTUALIZADA */}
                     <div className="filter-group">
                         <label>Desde:</label>
-                        <input type="date" />
+                        <input 
+                            type="date" 
+                            value={fechaDesde}
+                            onChange={(e) => setFechaDesde(e.target.value)}
+                        />
                         <label>Hasta:</label>
-                        <input type="date" />
+                        <input 
+                            type="date" 
+                            value={fechaHasta}
+                            onChange={(e) => setFechaHasta(e.target.value)}
+                        />
                     </div>
-                    <button className="btn-buscar">Buscar</button>
+                    
+                    <button className="btn-buscar" onClick={handleBuscarPorFechas}>Buscar</button>
+                    
+                    {/* Botón extra recomendado para regresar al estado inicial sin recargar la página */}
+                    {(fechaDesde || fechaHasta) && (
+                        <button 
+                            className="btn-buscar" 
+                            style={{backgroundColor: '#7f8c8d', marginTop: '5px'}} 
+                            onClick={handleLimpiarFiltro}
+                        >
+                            Limpiar Filtro
+                        </button>
+                    )}
+                    
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
