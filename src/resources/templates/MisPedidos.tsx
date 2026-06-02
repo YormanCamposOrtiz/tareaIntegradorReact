@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DashboardHeader } from './fragments/DashboardHeader';
+import { Header } from './fragments/Header';
+import { Footer } from './fragments/Footer';
 import api from "../../api"; 
 
 // Importación corregida según tu estructura de carpetas
@@ -33,7 +34,7 @@ interface Pedido {
 }
 
 
-export function DashboardPedidos() {
+export function MisPedidos() {
     const navigate = useNavigate();
 
     // Estados de datos de la API
@@ -48,42 +49,26 @@ export function DashboardPedidos() {
         fetchPedidos();
     }, []);
 
+
     const fetchPedidos = async (desde?: string, hasta?: string) => {
         try {
-            // Construcción dinámica de la URL con Query Params para fechas si existen
-            let url = '/pedidos';
-            if (desde && hasta) {
-                url += `?inicio=${desde}&fin=${hasta}`;
+
+            const usuarioId = localStorage.getItem("userId");
+
+            if (!usuarioId) {
+                alert("No se encontró la sesión del usuario.");
+                return;
             }
 
-            const response = await api.get(url);
-            setPedidos(response.data);
-            setPedidoSeleccionado(null);
-        } catch (error) {
-            console.error("Error al cargar pedidos desde Spring Boot:", error);
-        }
-    };
-
-    const actualizarEstado = async (nuevoEstado: string) => {
-        if (!pedidoSeleccionado) {
-            alert("Por favor, seleccione un pedido en la tabla superior.");
-            return;
-        }
-
-        try {
-            await api.put(
-                `/pedidos/${pedidoSeleccionado.id}/estado`,
-                null,
-                {
-                    params: { nuevoEstado }
-                }
+            const response = await api.get(
+                `/pedidos/usuario/${usuarioId}`
             );
 
-            alert(`¡Estado del pedido actualizado a ${nuevoEstado} correctamente!`);
-            fetchPedidos(fechaDesde, fechaHasta);
+            setPedidos(response.data);
+            setPedidoSeleccionado(null);
+
         } catch (error) {
-            console.error(error);
-            alert("No se pudo actualizar el estado del pedido.");
+            console.error("Error al cargar pedidos:", error);
         }
     };
 
@@ -132,7 +117,8 @@ export function DashboardPedidos() {
 
     return (
         <div className="ventas-container"> {/* Usa el mismo container de ventas */}
-            <DashboardHeader />
+
+            <Header />
 
             <div className="ventas-content">
                 {/* SIDEBAR CON LOS MISMOS BOTONES Y DISEÑO DE VENTAS */}
@@ -142,70 +128,8 @@ export function DashboardPedidos() {
                         style={{ backgroundColor: '#2980b9', color: 'white' }} 
                         onClick={() => fetchPedidos(fechaDesde, fechaHasta)}
                     >
-                        🔄 Actualizar Lista
+                        🔄 Actualizar mi Lista
                     </button>
-
-                    {/* COMBO BOX PARA CONTROL DE FLUJO DE ESTADO */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-                        <label 
-                            htmlFor="estado-pedido" 
-                            style={{ fontSize: '12px', fontWeight: 'bold', color: '#7f8c8d' }}
-                        >
-                            Cambiar Estado del Pedido:
-                        </label>
-                        <select
-                            id="estado-pedido"
-                            className="select-estado"
-                            style={{
-                                padding: '10px',
-                                borderRadius: '6px',
-                                border: '1px solid #ccc',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                backgroundColor: !pedidoSeleccionado 
-                                    ? '#95a5a6' 
-                                    : pedidoSeleccionado.estado === 'PREPARANDO' ? '#f39c12'
-                                    : pedidoSeleccionado.estado === 'ENVIADO' ? '#3498db'
-                                    : pedidoSeleccionado.estado === 'ENTREGADO' ? '#2ecc71'
-                                    : '#34495e', // Color por defecto (ej. PENDIENTE)
-                                color: 'white',
-                                cursor: pedidoSeleccionado ? 'pointer' : 'not-allowed',
-                                outline: 'none',
-                                transition: 'background-color 0.3s ease'
-                            }}
-                            disabled={!pedidoSeleccionado}
-                            // Tomamos el valor actual del pedido seleccionado, si no hay, se muestra vacío
-                            value={pedidoSeleccionado?.estado || ""}
-                            // Cuando el usuario cambia la opción, gatilla tu función de actualización de Spring Boot
-                            onChange={(e) => {
-                                if (e.target.value) {
-                                    actualizarEstado(e.target.value);
-                                }
-                            }}
-                        >
-                            {/* Opción por defecto cuando no hay selección */}
-                            {!pedidoSeleccionado && <option value="">Seleccione un pedido...</option>}
-                            
-                            {/* Si hay un pedido pendiente, mostramos su opción correspondiente */}
-                            {pedidoSeleccionado?.estado === 'PENDIENTE' && (
-                                <option value="PENDIENTE" style={{ color: '#34495e', backgroundColor: 'white' }}>
-                                    ⏳ Pendiente
-                                </option>
-                            )}
-
-                            {/* Opciones del flujo */}
-                            <option value="PREPARANDO" style={{ color: '#f39c12', backgroundColor: 'white' }}>
-                                👨‍🍳 Preparando
-                            </option>
-                            <option value="ENVIADO" style={{ color: '#3498db', backgroundColor: 'white' }}>
-                                🚚 Enviado
-                            </option>
-                            <option value="ENTREGADO" style={{ color: '#2ecc71', backgroundColor: 'white' }}>
-                                ✅ Entregado
-                            </option>
-
-                        </select>
-                    </div>
 
                     <button
                         className="btn-anular"
@@ -218,7 +142,7 @@ export function DashboardPedidos() {
                         }}
                         disabled={!pedidoSeleccionado}
                     >
-                        Cancelar Pedido
+                        Cancelar mi Pedido
                     </button>
 
                     {/* SECCIÓN DEL FILTRO DE FECHAS EN PEDIDOS */}
@@ -250,14 +174,13 @@ export function DashboardPedidos() {
                         </button>
                     )}
 
-                    <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
                 {/* CUERPO PRINCIPAL CON TABLAS */}
                 <main className="ventas-main">
                     {/* TABLA PRINCIPAL DE PEDIDOS SOLICITADOS */}
                     <div className="table-wrapper">
-                        <h3>Historial de Pedidos Web</h3>
+                        <h3>Historial de mis Pedidos </h3>
                         <table>
                             <thead>
                                 <tr>
@@ -364,6 +287,9 @@ export function DashboardPedidos() {
                     </div>
                 </main>
             </div>
+
+            <Footer />
+
         </div>
     );
 }

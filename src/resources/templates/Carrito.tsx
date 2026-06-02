@@ -4,7 +4,9 @@ import { ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
 
 import { Header } from './fragments/Header';
 import { Footer } from './fragments/Footer';
-import { FormularioCheckout } from './FormularioCheckout'; // Importamos FormularioCheckout
+import { FormularioCheckout } from './FormularioCheckout'; 
+
+import api from "../../api"; 
 
 import "../static/Global.css";
 import "../static/Carrito.css"; 
@@ -21,8 +23,11 @@ interface CartItem {
 export function Carrito() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [paso, setPaso] = useState<'carrito' | 'checkout'>('carrito');
+  
+  // Estado para controlar pantallas de carga o deshabilitar botones al procesar
+  const [cargando, setCargando] = useState(false);
 
-  // Estados del Formulario (se manejan aquí para calcular el envío en la card resumen)
+  // Estados del Formulario
   const [metodoEntrega, setMetodoEntrega] = useState<'domicilio' | 'tienda'>('domicilio');
   const [metodoPago, setMetodoPago] = useState<'yape_plin' | 'tarjeta'>('yape_plin');
   const [direccion, setDireccion] = useState('');
@@ -66,16 +71,84 @@ export function Carrito() {
   const costoEnvio = metodoEntrega === 'domicilio' && items.length > 0 ? 7.90 : 0;
   const totalGeneral = subtotal + costoEnvio;
 
-  const procesarPagoFinal = () => {
+// ==========================================
+  // CONEXIÓN CON EL BACKEND PEDIDOS (Lógica Sincronizada con Dashboard)
+  // ==========================================
+  const procesarPagoFinal = async () => {
+    // 1. Validaciones previas en el Frontend (Dirección)
     if (metodoEntrega === 'domicilio' && (!direccion || !distrito)) {
       alert("Por favor, completa los datos de tu dirección de entrega.");
       return;
     }
-    alert(`¡Pedido Procesado Exitosamente!\nMétodo: ${metodoEntrega === 'domicilio' ? 'Envío a domicilio' : 'Recojo en tienda'}\nPago: ${metodoPago === 'yape_plin' ? 'Yape / Plin' : 'Tarjeta'}\nMonto Total: S/ ${totalGeneral.toFixed(2)}`);
+
+    // 2. Validación estricta del Usuario Logueado (Igual a la lógica que te funciona)
+    const loggedInUserId = localStorage.getItem("userId");
+    
+    if (!loggedInUserId) {
+      alert("No se detectó una sesión activa de usuario. Por favor, vuelva a iniciar sesión.");
+      return;
+    }
+
+    // Construcción de la dirección final
+    const direccionFinal = metodoEntrega === 'domicilio' 
+      ? `${direccion} - ${distrito}` 
+      : 'Recojo en tienda';
+
+    // Construcción de las observaciones
+    const observacionesFinal = `Pago mediante: ${metodoPago === 'yape_plin' ? 'Yape/Plin' : 'Tarjeta'}`;
+
+    // 3. Estructurar el JSON limpio usando el ID validado de manera idéntica al bueno
+    const nuevaVentaPedido = {
+      usuario: {
+        id: parseInt(loggedInUserId, 10)
+      },
+      direccionEnvio: direccionFinal,
+      observaciones: observacionesFinal,
+      detalles: items.map(item => ({
+        cantidad: item.cantidad,
+        producto: {
+          id: item.id
+        }
+      }))
+    };
+
+    try {
+      setCargando(true);
+
+      // 4. Petición HTTP POST al controlador de pedidos
+      const response = await api.post('/pedidos', nuevaVentaPedido);
+
+      // 5. Manejo de respuesta exitosa
+      if (response.status === 200 || response.status === 201) {
+        const pedidoCreado = response.data;
+        
+        alert(`¡Pedido N° ${pedidoCreado.id || 'Exitoso'} registrado con éxito en el sistema!`);
+        
+        // Limpiar el estado del carrito local tras la compra
+        guardarCarrito([]);
+        setPaso('carrito');
+      }
+
+    } catch (err: any) {
+      console.error("Error al registrar el pedido:", err);
+      
+      if (err.response && err.response.data) {
+        const mensajeError = typeof err.response.data === 'string' 
+          ? err.response.data 
+          : (err.response.data.message || err.response.data.detail || 'Verifique los datos o el stock disponible.');
+          
+        alert(`Error en el servidor: ${mensajeError}`);
+      } else {
+        alert("Hubo un problema de conexión al comunicar con Spring Boot.");
+      }
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
     <div className="carrito-container">
+
       <Header />
 
       <h1 className="carrito-title">
@@ -132,7 +205,6 @@ export function Carrito() {
                 </div>
               )
             ) : (
-              /* Aquí invocamos el subcomponente limpio pasando las variables por Props */
               <FormularioCheckout 
                 metodoEntrega={metodoEntrega}
                 setMetodoEntrega={setMetodoEntrega}
@@ -147,7 +219,7 @@ export function Carrito() {
             )}
           </div>
       
-          {/* COLUMNA DERECHA COMPACTA (RESUMEN) */}
+          {/* COLUMNA DERECHA (RESUMEN) */}
           <aside className="cart-right-column">
             <div className="carrito-summary-card">
               <h2 className="summary-title">Resumen de Compra</h2>
@@ -173,18 +245,25 @@ export function Carrito() {
               
               <div className="cart-action-buttons">
                 {paso === 'carrito' ? (
-                  <>
-                    <button 
-                      className="btn-payment-now" 
-                      onClick={() => setPaso('checkout')}
-                      disabled={items.length === 0}
-                    >
-                      CONTINUAR COMPRA
-                    </button>
-                  </>
+                  <button 
+                    className="btn-payment-now" 
+                    onClick={() => setPaso('checkout')}
+                    disabled={items.length === 0}
+                  >
+                    CONTINUAR COMPRA
+                  </button>
                 ) : (
-                  <button className="btn-final-pay" onClick={procesarPagoFinal}>
-                    {metodoPago === 'yape_plin' ? 'PAGAR CON YAPE/PLIN' : 'PAGAR CON TARJETA'}
+                  <button 
+                    // 💡 Añadida clase condicional para opacidad cuando procesa
+                    className={`btn-final-pay ${cargando ? 'btn-disabled' : ''}`} 
+                    onClick={procesarPagoFinal}
+                    disabled={cargando || items.length === 0} 
+                  >
+                    {cargando ? 'PROCESANDO...' : (
+                      metodoPago === 'yape_plin' 
+                        ? `PAGAR S/ ${totalGeneral.toFixed(2)} CON YAPE/PLIN` 
+                        : `PAGAR S/ ${totalGeneral.toFixed(2)} CON TARJETA`
+                    )}
                   </button>
                 )}
               </div>

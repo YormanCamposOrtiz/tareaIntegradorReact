@@ -85,7 +85,7 @@ export function Perfil() {
 
             {/* Listado de acciones */}
             <div className="perfil-options">
-              <Link to="/mis-pedidos" className="perfil-option-item">
+              <Link to="/perfil/mispedidos" className="perfil-option-item">
                 <div className="option-icon-box"><Package /></div>
                 <div className="option-text">
                   <h3>Mis Pedidos</h3>
@@ -114,14 +114,6 @@ export function Perfil() {
                 <span className="option-arrow">→</span>
               </Link>
               
-              <Link to="#" className="perfil-option-item">
-                <div className="option-icon-box"><Heart /></div>
-                <div className="option-text">
-                  <h3>Favoritos</h3>
-                  <p>Productos guardados</p>
-                </div>
-                <span className="option-arrow">→</span>
-              </Link>
 
               <Link to="#" className="perfil-option-item">
                 <div className="option-icon-box"><Settings /></div>
