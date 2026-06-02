@@ -41,7 +41,7 @@
 .btn-anular { background: #f97316; color: white; }
 .btn-actualizar { background: #004d4d; color: white; }
 .btn-buscar { background: white; color: #008000; border: 2px solid #008000 !important; }
-.btn-cerrar { background: white; color: red; border: 2px solid red !important; margin-top: auto; }
+
 
 /* AREA PRINCIPAL DE TABLAS */
 .ventas-main {
@@ -103,4 +103,26 @@ tbody td {
     border-radius: 12px;
     border: 1px solid #ddd;
     background: #f1f5f9;
+}
+
+button.btn-cerrar, 
+.btn-cerrar {
+    background-color: #dc2626 !important; /* Rojo sólido de fondo */
+    color: #ffffff !important;            /* Texto blanco para que contraste */
+    border: 1.5px solid #dc2626 !important;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: auto;
+    transition: all 0.25s ease-in-out;
+}
+
+/* Efecto al pasar el mouse (Hover) */
+button.btn-cerrar:hover,
+.btn-cerrar:hover {
+    background-color: #b91c1c !important; /* Un rojo un poco más oscuro al pasar el mouse */
+    border-color: #b91c1c !important;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
 }

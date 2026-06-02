@@ -68,23 +68,31 @@ export function DashboardVentas() {
     const [busqueda, setBusqueda] = useState('');
     const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
 
+    // Estados para el filtrado por fechas
+    const [fechaDesde, setFechaDesde] = useState('');
+    const [fechaHasta, setFechaHasta] = useState('');
+
     useEffect(() => {
         fetchDatos();
     }, []);
 
-    const fetchDatos = async () => {
-        try {
-            const prodResponse = await api.get('/productos');
-            setProductos(prodResponse.data);
-            
-            const ventasResponse = await api.get('/ventas');
-            setVentas(ventasResponse.data);
-            
-            // Limpiar la selección al actualizar para evitar datos desfasados
-            setVentaSeleccionada(null);
-        } catch (error) {
-            console.error("Error al cargar datos desde Spring Boot:", error);
+    const fetchDatos = async (desde?: string, hasta?: string) => {
+    try {
+        const prodResponse = await api.get('/productos');
+        setProductos(prodResponse.data);
+        
+        // Construcción dinámica de la URL con Query Params
+        let url = '/ventas';
+        if (desde && hasta) {
+            url += `?inicio=${desde}&fin=${hasta}`;
         }
+        
+        const ventasResponse = await api.get(url);
+        setVentas(ventasResponse.data);
+        setVentaSeleccionada(null);
+    } catch (error) {
+        console.error("Error al cargar datos desde Spring Boot:", error);
+    }
     };
 
     const agregarAlCarrito = (prod: Producto) => {
@@ -178,6 +186,55 @@ export function DashboardVentas() {
         }
     };
 
+    const handleEliminarVenta = async () => {
+    if (!ventaSeleccionada) return;
+
+    // Preguntar siempre confirmación antes de una acción destructiva
+    const confirmar = window.confirm(
+        `¿Está completamente seguro de que desea ANULAR la venta #${String(ventaSeleccionada.id).padStart(3, '0')}?\n` +
+        `Esto devolverá los productos vendidos directamente al stock actual.`
+    );
+
+    if (!confirmar) return;
+
+    try {
+        // Petición HTTP DELETE al backend de Spring Boot
+        const response = await api.delete(`/ventas/${ventaSeleccionada.id}`);
+        
+        if (response.status === 200) {
+            alert("¡Venta anulada correctamente! El inventario ha sido restablecido.");
+            // Refrescar la lista de ventas y limpiar la selección actual
+            fetchDatos(); 
+        }
+    } catch (err: any) {
+        console.error("Error al eliminar la venta:", err);
+        if (err.response && err.response.data) {
+            alert(`Error en el servidor: ${err.response.data.message || 'No se pudo anular la venta.'}`);
+        } else {
+            alert("Hubo un problema de conexión al intentar anular la venta.");
+        }}
+    };
+
+    // Ejecutar búsqueda por fechas
+    const handleBuscarPorFechas = () => {
+        if (!fechaDesde || !fechaHasta) {
+            alert("Por favor, seleccione ambas fechas para aplicar el filtro.");
+            return;
+        }
+        if (new Date(fechaDesde) > new Date(fechaHasta)) {
+            alert("La fecha inicial ('Desde') no puede ser posterior a la fecha final ('Hasta').");
+            return;
+        }
+        fetchDatos(fechaDesde, fechaHasta);
+    };
+
+    // Restablecer el panel
+    const handleLimpiarFiltro = () => {
+        setFechaDesde('');
+        setFechaHasta('');
+        fetchDatos(); // Carga el historial completo
+    };
+    
     const productosFiltrados = busqueda === '' ? [] : productos.filter(p => 
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
@@ -188,18 +245,51 @@ export function DashboardVentas() {
 
             <div className="ventas-content">
                 <aside className="ventas-sidebar">
-                    <button className="btn-actualizar" style={{backgroundColor: '#27ae60', color: 'white'}} onClick={() => setIsModalOpen(true)}>
-                        📦 Nueva Venta
+                    <button className="btn-actualizar" style={{ backgroundColor: '#2980b9', color: 'white' }} onClick={() => setIsModalOpen(true)}>
+                        🛒 Nueva Venta
                     </button>
-                    <button className="btn-anular">Anular Venta</button>
-                    <button className="btn-actualizar" onClick={fetchDatos}>Actualizar</button>
-                    <div className="filter-group">
+                    <button 
+                        className="btn-anular"
+                        onClick={handleEliminarVenta}
+                        style={{
+                            backgroundColor: ventaSeleccionada ? '#e74c3c' : '#95a5a6',
+                            color: 'white',
+                            cursor: ventaSeleccionada ? 'pointer' : 'not-allowed'
+                        }}
+                        disabled={!ventaSeleccionada}
+                    >
+                        Anular Venta
+                    </button>
+
+                    {/* SECCIÓN DEL FILTRO DE FECHAS EN VENTAS */}
+                    <div className="filter-group" style={{ marginTop: '15px' }}>
                         <label>Desde:</label>
-                        <input type="date" />
+                        <input 
+                            type="date" 
+                            value={fechaDesde}
+                            onChange={(e) => setFechaDesde(e.target.value)}
+                        />
                         <label>Hasta:</label>
-                        <input type="date" />
+                        <input 
+                            type="date" 
+                            value={fechaHasta}
+                            onChange={(e) => setFechaHasta(e.target.value)}
+                        />
                     </div>
-                    <button className="btn-buscar">Buscar</button>
+
+                    <button className="btn-buscar" onClick={handleBuscarPorFechas}>Buscar</button>
+
+                    {/* Botón dinámico para limpiar la búsqueda */}
+                    {(fechaDesde || fechaHasta) && (
+                        <button 
+                            className="btn-buscar" 
+                            style={{ backgroundColor: '#ffffff', marginTop: '5px' }} 
+                            onClick={handleLimpiarFiltro}
+                        >
+                            Limpiar Filtro
+                        </button>
+                    )}
+
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 

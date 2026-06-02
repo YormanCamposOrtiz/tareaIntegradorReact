@@ -7,6 +7,7 @@ import { Inicio } from "./resources/templates/Inicio";
 import { Login } from "./resources/templates/Login";
 import { Carrito } from "./resources/templates/Carrito";
 import { Perfil } from "./resources/templates/Perfil";
+import { MisPedidos } from "./resources/templates/MisPedidos";
 import { Registro } from "./resources/templates/Registro";
 import { RecuperarPassword } from "./resources/templates/RecuperarPassword";
 import { RegistroAdmin } from "./resources/templates/RegistroAdmin";
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/perfil/mispedidos" element={<MisPedidos />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
         <Route path="/admin/registro" element={<RegistroAdmin />} />
