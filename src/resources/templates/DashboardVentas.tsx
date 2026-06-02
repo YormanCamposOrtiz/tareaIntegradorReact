@@ -283,7 +283,7 @@ export function DashboardVentas() {
                     {(fechaDesde || fechaHasta) && (
                         <button 
                             className="btn-buscar" 
-                            style={{ backgroundColor: '#7f8c8d', marginTop: '5px' }} 
+                            style={{ backgroundColor: '#ffffff', marginTop: '5px' }} 
                             onClick={handleLimpiarFiltro}
                         >
                             Limpiar Filtro

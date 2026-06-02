@@ -140,3 +140,12 @@ tr:hover {
   text-align: center;
   color: #94a3b8;
 }
+
+/* Contenedor principal para centrar o alinear la barra */
+.search-container {
+    display: flex;
+    justify-content: center; /* Centra la barra horizontalmente (cambia a flex-start si la quieres a la izquierda) */
+    align-items: center;
+    margin: 20px 0;          /* Espaciado arriba y abajo */
+}
+

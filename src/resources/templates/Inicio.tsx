@@ -21,6 +21,7 @@ export function Inicio() {
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState(0);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null);
+  const [busqueda, setBusqueda] = useState('');
 
   // 2. Datos locales (Sin llamadas a API por ahora)
   const offers = [
@@ -102,41 +103,54 @@ const fetchDatos = async () => {
   };
 
 
-  // --- LÓGICA DE FILTRADO ---
-const productosFiltrados = categoriaSeleccionada
-  ? productos.filter(p => p.categoria?.id === categoriaSeleccionada)
-  : productos;
+
+// --- LÓGICA DE FILTRADO COMBINADA (Categoría + Nombre) ---
+const productosFiltrados = productos.filter(prod => {
+  // 1. Filtrar por categoría (si hay una seleccionada)
+  const coincideCategoria = categoriaSeleccionada 
+    ? prod.categoria?.id === categoriaSeleccionada 
+    : true;
+
+  // 2. Filtrar por nombre (si el usuario escribió algo)
+  const coincideBusqueda = prod.nombre
+    .toLowerCase()
+    .includes(busqueda.toLowerCase().trim());
+
+  return coincideCategoria && coincideBusqueda;
+});
+
 
 
 return (
 
-<div className="home-container min-h-screen bg-gray-50">
+   <div className="home-container min-h-screen bg-gray-50">
 
-<Header />
+    <Header />
 
-<main className="w-full px-6 py-10">
+    <main className="w-full px-6 py-10">
 
-{/* Carrusel */}
-<div className="carousel-container">
+        {/* Carrusel */}
+        <div className="carousel-container">
 
-  {/* 🔥 CARRUSEL */}
-  <div className="carousel-card fade-in">
-    
-    <img 
-      src={offers[selectedOffer].image} 
-      className="carousel-image"
-    />
+          {/* 🔥 CARRUSEL */}
+          <div className="carousel-card fade-in">
+            
+            <img 
+              src={offers[selectedOffer].image} 
+              className="carousel-image"
+            />
 
-    <div className="carousel-overlay">
+            <div className="carousel-overlay">
 
-    </div>
+            </div>
 
-  </div>
-</div>
+          </div>
+        </div>
 
-
-{/* 🏷️ SECCIÓN DE CATEGORÍAS (Reales de tu BD) */}
+        {/* 🏷️ SECCIÓN DE CATEGORÍAS (Reales de tu BD) */}
         <section className="mt-16 w-full flex flex-col items-center">
+
+
           <h2 className="section-title">Nuestras Categorías</h2>
           <div className="category-grid">
             {/* Opción para ver "Todos" */}
@@ -165,13 +179,29 @@ return (
 
 
 
-        {/* 💊 GRILLA DE PRODUCTOS */}
-        <section className="mt-12">
-          <h3 className="products-grid-title">
+      {/* 💊 GRILLA DE PRODUCTOS */}
+      <section className="mt-12">
+        {/* 🌟 Contenedor alineado con Flexbox */}
+        <div className="products-grid-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          
+          <h3 className="products-grid-title" style={{ margin: 0 }}>
             {categoriaSeleccionada 
               ? `Resultados en ${categorias.find(c => c.id === categoriaSeleccionada)?.nombre}` 
               : "Todos nuestros productos"}
           </h3>
+
+          {/* 🔍 BARRA DE BÚSQUEDA DEL CLIENTE (A la derecha) */}
+          <div className="search-container" style={{ margin: 0 }}>
+            <input
+              type="text"
+              placeholder="Buscar producto por nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="input-search"
+            />
+          </div>
+
+        </div>
 
           <div className="products-grid">
             {productosFiltrados.length > 0 ? (

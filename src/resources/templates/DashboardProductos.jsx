@@ -5,6 +5,8 @@ import { Home, Heart, Plus, Trash2, Edit, X, Package, Eye } from 'lucide-react';
 
 import { DashboardHeader } from './fragments/DashboardHeader';
 import "../static/DashboardProductos.css";
+import "../static/Dashboard.css";
+
 import api from "../../api";
 
 export function DashboardProductos() {
@@ -166,16 +168,15 @@ export function DashboardProductos() {
 
                 <div className="table-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
 
-                    <div className="search-container">
-                        <input
-                            type="text"
-                            placeholder="Buscar producto por nombre..."
-                            value={busqueda}
-                            onChange={(e) => setBusqueda(e.target.value)}
-                            className="input-search"
-                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', width: '300px' }}
-                        />
-                    </div>
+                <div className="search-container">
+                    <input
+                        type="text"
+                        placeholder="Buscar producto por nombre..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        className="input-search"
+                    />
+                </div>
 
                     <button className="btn-nuevo-header" onClick={() => openModal()}>
                         <Plus size={18} /> Nuevo Producto
