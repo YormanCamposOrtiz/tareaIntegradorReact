@@ -99,6 +99,7 @@ return (
 
           {/* 2. TÍTULOS (MediExpress y Panel) */}
           <h1>MediExpress</h1>
+          <p className="login-subtitle">Panel de Administración</p>
 
           <form onSubmit={handleSubmit} className="space-y-1">
             

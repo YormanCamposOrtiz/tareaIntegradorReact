@@ -55,7 +55,7 @@
 .login-card h1 {
   color: #1c1917; /* Gris muy oscuro */
   font-weight: 800;
-  font-size: 1.9 rem;
+  font-size: 1.9rem;
   letter-spacing: -0.03em;
   margin-bottom: 5px;
 }
@@ -176,4 +176,81 @@
 /* Ajuste para que el texto de la contraseña no choque con el ojo */
 .login-input {
   padding-right: 40px !important; 
+}
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 768px) {
+
+  .login-main {
+    padding: 15px;
+  }
+
+  .login-card {
+    max-width: 380px;
+    padding: 30px;
+  }
+
+  .logo-circle {
+    width: 75px;
+    height: 75px;
+  }
+
+  .logo-circle svg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .login-card h1 {
+    font-size: 1.6rem;
+  }
+
+}
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 480px) {
+
+  .login-main {
+    padding: 10px;
+  }
+
+  .login-card {
+    width: 100%;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .logo-circle {
+    width: 65px;
+    height: 65px;
+  }
+
+  .logo-circle svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .login-card h1 {
+    font-size: 1.4rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .login-input {
+    font-size: 0.9rem;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .login-button {
+    font-size: 1rem;
+    padding: 14px;
+  }
+
 }

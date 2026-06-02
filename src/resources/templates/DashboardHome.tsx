@@ -12,6 +12,7 @@ import {
   LogOut 
 } from "lucide-react";
 
+
 import { DashboardHeader } from './fragments/DashboardHeader';
 
 //import { DashboardHeader } from './fragments/DashboardHeader';
@@ -96,14 +97,14 @@ export function DashboardHome() {
               </div>
             </button>
 
-            <button className="module-card " onClick={() => navigate("/admin/registro")}>
+            <button className="module-card " onClick={() => navigate("/DashboardRegistro")}>
               <div className="module-icon"><UserPlus size={32}/></div>
               <div className="module-info">
                 <h3>Nuevo Admin</h3>
                 <p>Registrar personal</p>
               </div>
             </button>
-            <button className="module-card " onClick={() => navigate("/admin/gestion")}>
+            <button className="module-card " onClick={() => navigate("/DashboardUsuarios")}>
               <div className="module-icon"><UserPlus size={32}/></div>
               <div className="module-info">
                 <h3>Gestionar Admins</h3>
