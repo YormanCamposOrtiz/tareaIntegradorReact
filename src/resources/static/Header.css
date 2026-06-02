@@ -79,4 +79,51 @@ header.sticky {
     backdrop-filter: blur(8px);
     background-color: rgba(234, 88, 12, 0.95); /* Orange-600 con transparencia */
 }
+/* ========================= */
+/* TABLET */
+/* ========================= */
+@media (max-width: 768px) {
+
+  .header-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .header-left,
+  .header-center,
+  .header-right {
+    justify-content: center;
+  }
+
+  .brand-title {
+    font-size: 1.5rem;
+  }
+
+}
+
+/* ========================= */
+/* CELULAR */
+/* ========================= */
+@media (max-width: 480px) {
+
+  .header-container {
+    padding: 12px 4%;
+    gap: 10px;
+  }
+
+  .brand-title {
+    font-size: 1.2rem;
+  }
+
+  .header-right {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
+  }
+
+}
 
