@@ -142,3 +142,96 @@
   background: #fef2f2;
   transform: scale(0.98);
 }
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 768px) {
+
+  .perfil-card {
+    border-radius: 25px;
+  }
+
+  .user-name {
+    font-size: 1.8rem;
+  }
+
+  .user-email {
+    font-size: 1rem;
+  }
+
+  .option-text h3 {
+    font-size: 1.2rem;
+  }
+
+  .option-arrow {
+    font-size: 2rem;
+  }
+
+}
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 480px) {
+
+  .perfil-banner {
+    padding: 20px 10px;
+  }
+
+  .user-avatar-container {
+    width: 65px;
+    height: 65px;
+  }
+
+  .user-avatar-container svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-name {
+    font-size: 1.5rem;
+  }
+
+  .user-email {
+    font-size: 0.9rem;
+  }
+
+  .perfil-options {
+    padding: 12px;
+  }
+
+  .perfil-option-item {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .option-icon-box {
+    width: 45px;
+    height: 45px;
+  }
+
+  .option-icon-box svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .option-text h3 {
+    font-size: 1rem;
+  }
+
+  .option-text p {
+    font-size: 0.85rem;
+  }
+
+  .option-arrow {
+    font-size: 1.5rem;
+  }
+
+  .btn-logout {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+}
