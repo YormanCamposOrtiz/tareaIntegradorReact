@@ -12,7 +12,8 @@ import "../static/Global.css";
 
 import imagen1 from "/src/resources/static/assets/oferta2.png";
 import imagen2 from "/src/resources/static/assets/oferta1.png";
-import imagen3 from "/src/resources/static/assets/oferta3.png";
+import imagen3 from "/src/resources/static/assets/oferta4.png";
+import imagen4 from "/src/resources/static/assets/imagen4.jpeg";
 
 export function Inicio() {
   
@@ -28,6 +29,7 @@ export function Inicio() {
     {  image: imagen3, discount: 20, category: "Vitaminas" },
     {  image: imagen2, discount: 0, category: "Envío" },
     {  image: imagen1, discount: 15, category: "Medicamentos" },
+    {  image: imagen4, discount: 25, category: "Suplementos" },
   ];
 
 
