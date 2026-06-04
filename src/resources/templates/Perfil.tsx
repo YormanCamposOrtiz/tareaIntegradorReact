@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, MapPin, Package, Settings, LogOut, Shield, Plus, Trash2, ArrowLeft, Save } from "lucide-react";
+import { User, MapPin, Package, Settings, LogOut, Shield, ArrowLeft, Save } from "lucide-react";
 import axios from "axios";
 
 import { Header } from './fragments/Header';
@@ -14,14 +14,9 @@ interface Usuario {
   nombre: string;
   correo: string; 
   rol: string; 
-  intentos_fallidos: number; 
-}
-
-interface Direccion {
-  id: string;
-  etiqueta: string;
-  distrito: string;
-  direccionExacta: string;
+  intentos_fallidos: number;
+  direccion?: string; // 🔄 CAMBIO: Agregados opcionales para tipado
+  telefono?: string;
 }
 
 export function Perfil() {
@@ -29,9 +24,9 @@ export function Perfil() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"menu" | "direcciones" | "configuracion">("menu");
   
-  // --- Estados de Direcciones ---
-  const [direcciones, setDirecciones] = useState<Direccion[]>([]);
-  const [nuevaDir, setNuevaDir] = useState({ etiqueta: "", distrito: "", direccionExacta: "" });
+  // --- 🔄 CAMBIO: Estados de Dirección Simplificados (Opción A) ---
+  const [direccionForm, setDireccionForm] = useState({ distrito: "", direccionExacta: "" });
+  const [mensajeDireccion, setMensajeDireccion] = useState("");
 
   // --- Estados de Configuración ---
   const [configForm, setConfigForm] = useState({ nombre: "", telefono: "", password: "", confirmPassword: "" });
@@ -48,29 +43,33 @@ export function Perfil() {
       return;
     }
     
+    // Carga inicial del usuario desde la base de datos
     axios.get(`http://localhost:8080/api/auth/buscar?correo=${userEmail}`)
       .then((res) => {
         setUsuario(res.data);
-        setConfigForm(prev => ({ ...prev, nombre: res.data.nombre }));
+        
+        // 🔄 CAMBIO: Inicializar los formularios con la data real que viene de NeonTech
+        setConfigForm(prev => ({ 
+          ...prev, 
+          nombre: res.data.nombre, 
+          telefono: res.data.telefono || "" 
+        }));
+
+        // Si ya hay una dirección, intentar separarla por la coma para rellenar los inputs
+        if (res.data.direccion) {
+          const partes = res.data.direccion.split(", ");
+          setDireccionForm({
+            direccionExacta: partes[0] || "",
+            distrito: partes[1] || ""
+          });
+        }
+        
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error al conectar con PostgreSQL:", err);
-        setLoading(false);
+        loading && setLoading(false);
       });
-
-    // Cargar direcciones iniciales desde LocalStorage
-    const guardadas = localStorage.getItem("user_direcciones");
-    if (guardadas) {
-      setDirecciones(JSON.parse(guardadas));
-    } else {
-      const iniciales = [
-        { id: "1", etiqueta: "Casa", distrito: "Santiago de Surco", direccionExacta: "Av. Caminos del Inca 1234" },
-        { id: "2", etiqueta: "Trabajo", distrito: "Miraflores", direccionExacta: "Calle Larco 456" }
-      ];
-      setDirecciones(iniciales);
-      localStorage.setItem("user_direcciones", JSON.stringify(iniciales));
-    }
   }, [navigate]);
 
   const handleLogout = () => {
@@ -80,37 +79,67 @@ export function Perfil() {
     navigate("/login");
   };
 
-  // --- Operaciones CRUD Direcciones ---
-  const handleAgregarDireccion = (e: React.FormEvent) => {
+  // --- 🔄 CAMBIO: Guardar Dirección única en NeonTech ---
+  const handleGuardarDireccion = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nuevaDir.etiqueta || !nuevaDir.distrito || !nuevaDir.direccionExacta) return;
+    if (!usuario) return;
 
-    const nueva: Direccion = {
-      id: Date.now().toString(),
-      ...nuevaDir
-    };
+    // Unificamos el texto como "Av. Siempre Viva 123, Surco"
+    const direccionCompleta = `${direccionForm.direccionExacta}, ${direccionForm.distrito}`;
 
-    const listaActualizada = [...direcciones, nueva];
-    setDirecciones(listaActualizada);
-    localStorage.setItem("user_direcciones", JSON.stringify(listaActualizada));
-    setNuevaDir({ etiqueta: "", distrito: "", direccionExacta: "" });
+    axios.put(`http://localhost:8080/api/perfil/${usuario.id}/datos`, {
+      direccion: direccionCompleta
+    })
+    .then((res) => {
+      setUsuario(res.data); // Sincronizamos estado global del componente
+      setMensajeDireccion("✅ Dirección de entrega guardada en la base de datos.");
+      setTimeout(() => setMensajeDireccion(""), 3000);
+    })
+    .catch((err) => {
+      console.error("Error al guardar dirección:", err);
+      setMensajeDireccion("❌ Error al conectar con el servidor.");
+    });
   };
 
-  const handleEliminarDireccion = (id: string) => {
-    const listaActualizada = direcciones.filter(dir => dir.id !== id);
-    setDirecciones(listaActualizada);
-    localStorage.setItem("user_direcciones", JSON.stringify(listaActualizada));
-  };
-
-  // --- Lógica Configuración ---
-  const handleGuardarConfig = (e: React.FormEvent) => {
+  // --- 🔄 CAMBIO: Guardar Configuración Personal y Contraseña Encriptada ---
+  const handleGuardarConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (configForm.password && configForm.password !== configForm.confirmPassword) {
-      setMensajeConfig("❌ Las contraseñas no coinciden");
-      return;
+    if (!usuario) return;
+
+    // 1. Validar cambio de contraseña si el usuario escribió algo
+    if (configForm.password) {
+      if (configForm.password !== configForm.confirmPassword) {
+        setMensajeConfig("❌ Las contraseñas no coinciden");
+        return;
+      }
+
+      try {
+        await axios.put(`http://localhost:8080/api/perfil/${usuario.id}/contrasena`, {
+          nuevaContrasena: configForm.password
+        });
+      } catch (err) {
+        console.error("Error al encriptar/cambiar contraseña:", err);
+        setMensajeConfig("❌ Error al actualizar la contraseña.");
+        return;
+      }
     }
-    setMensajeConfig("✅ ¡Cambios guardados con éxito en tu cuenta!");
-    setTimeout(() => setMensajeConfig(""), 3000);
+
+    // 2. Guardar Datos Personales (Nombre y Teléfono)
+    axios.put(`http://localhost:8080/api/perfil/${usuario.id}/datos`, {
+      nombre: configForm.nombre,
+      telefono: configForm.telefono
+    })
+    .then((res) => {
+      setUsuario(res.data); // Actualiza la cabecera (Avatar/Nombre) en caliente
+      setMensajeConfig("✅ ¡Cambios guardados con éxito en NeonTech!");
+      // Limpiamos los campos de password
+      setConfigForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      setTimeout(() => setMensajeConfig(""), 3000);
+    })
+    .catch((err) => {
+      console.error("Error al actualizar datos:", err);
+      setMensajeConfig("❌ Error al guardar datos personales.");
+    });
   };
 
   if (loading) {
@@ -125,7 +154,7 @@ export function Perfil() {
         <div className="max-w-4xl mx-auto w-full px-4">
           <div className="perfil-card">
             
-            {/* Banner de Cabecera (Reutilizado) */}
+            {/* Banner de Cabecera */}
             <div className="perfil-banner">
               {view !== "menu" && (
                 <button className="btn-back-perfil" onClick={() => setView("menu")}>
@@ -139,7 +168,7 @@ export function Perfil() {
               <h1 className="user-email">{usuario?.correo || "correo@ejemplo.com"}</h1>
               
               {usuario?.rol === "ADMINISTRADOR" && (
-                <span className="badge-admin">Modo Administrador</span>
+                <span className="badge-admin">Modo Administrator</span>
               )}
             </div>
 
@@ -169,8 +198,8 @@ export function Perfil() {
                 <button onClick={() => setView("direcciones")} className="perfil-option-item btn-menu-trigger">
                   <div className="option-icon-box"><MapPin /></div>
                   <div className="option-text">
-                    <h3>Direcciones</h3>
-                    <p>Gestionar puntos de entrega</p>
+                    <h3>Dirección de Entrega</h3>
+                    <p>Gestionar tu punto de envío para delivery</p>
                   </div>
                   <span className="option-arrow">→</span>
                 </button>
@@ -186,55 +215,43 @@ export function Perfil() {
               </div>
             )}
 
-            {/* VISTA 2: CRUD DIRECCIONES */}
+            {/* 🔄 VISTA 2 CONFIGURADA: DIRECCIÓN ÚNICA */}
             {view === "direcciones" && (
               <div className="subview-container">
-                <h2 className="subview-title">📍 Tus Direcciones Guardadas</h2>
+                <h2 className="subview-title">📍 Mi Dirección de Envío</h2>
                 
-                {/* Lista */}
-                <div className="direcciones-list">
-                  {direcciones.map(dir => (
-                    <div key={dir.id} className="direccion-item-box">
-                      <div className="direccion-info">
-                        <span className="dir-badge">{dir.etiqueta}</span>
-                        <h4>{dir.distrito}</h4>
-                        <p>{dir.direccionExacta}</p>
-                      </div>
-                      <button className="btn-delete-dir" onClick={() => handleEliminarDireccion(dir.id)}>
-                        <Trash2 />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                {mensajeDireccion && <div className="mensaje-alerta-config">{mensajeDireccion}</div>}
 
-                {/* Formulario */}
-                <form onSubmit={handleAgregarDireccion} className="subview-form">
-                  <h3>➕ Agregar Nueva Dirección</h3>
+                <form onSubmit={handleGuardarDireccion} className="subview-form">
+                  <h3>🏠 Actualizar Lugar de Entrega Frecuente</h3>
+                  <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '15px' }}>
+                    Esta dirección se cargará automáticamente cuando realices tus pedidos por delivery.
+                  </p>
+                  
                   <div className="form-group-row">
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Mi Casa, Trabajo" 
-                      value={nuevaDir.etiqueta}
-                      onChange={e => setNuevaDir({...nuevaDir, etiqueta: e.target.value})}
-                      required 
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Distrito (Ej: Surco)" 
-                      value={nuevaDir.distrito}
-                      onChange={e => setNuevaDir({...nuevaDir, distrito: e.target.value})}
-                      required 
-                    />
+                    <div style={{ width: '100%' }}>
+                      <label>Distrito</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ej: Santiago de Surco" 
+                        value={direccionForm.distrito}
+                        onChange={e => setDireccionForm({...direccionForm, distrito: e.target.value})}
+                        required 
+                      />
+                    </div>
                   </div>
+
+                  <label>Dirección Exacta</label>
                   <input 
                     type="text" 
-                    placeholder="Dirección Exacta (Av, Calle, Nro, Dpto)" 
-                    value={nuevaDir.direccionExacta}
-                    onChange={e => setNuevaDir({...nuevaDir, direccionExacta: e.target.value})}
+                    placeholder="Av, Calle, Nro de casa, Departamento" 
+                    value={direccionForm.direccionExacta}
+                    onChange={e => setDireccionForm({...direccionForm, direccionExacta: e.target.value})}
                     required 
                   />
+
                   <button type="submit" className="btn-submit-subview">
-                    <Plus size={18} /> Registrar Dirección
+                    <Save size={18} /> Guardar Dirección de Envío
                   </button>
                 </form>
               </div>
@@ -291,7 +308,7 @@ export function Perfil() {
 
           </div>
 
-          {/* Botón de Logout solo visible en el menú principal */}
+          {/* Botón de Logout */}
           {view === "menu" && (
             <button onClick={handleLogout} className="btn-logout">
               <LogOut className="w-6 h-6" />
