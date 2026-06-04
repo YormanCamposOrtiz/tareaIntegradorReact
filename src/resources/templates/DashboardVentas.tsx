@@ -135,6 +135,26 @@ export function DashboardVentas() {
         setCarrito(carrito.filter(item => item.id !== id));
     };
 
+    const handleExportarExcel = async () => {
+        try {
+            // CORREGIDO: Asegurar que apunte a los estados de fecha de este componente
+            // Si no usas filtros de fecha en ventas, puedes llamar a la ruta limpia: '/api/ventas/exportar'
+            const response = await api.get('/ventas/exportar', { 
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'reporte_ventas.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("Error al exportar Excel de ventas:", error);
+        }
+    };
+
     const totalGeneral = carrito.reduce((sum, item) => sum + item.subTotal, 0);
 
     const handleSaveVenta = async () => {
@@ -290,6 +310,7 @@ export function DashboardVentas() {
                         </button>
                     )}
 
+                    <button className="btn-buscar" onClick={handleExportarExcel}>Exportar Excel</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
