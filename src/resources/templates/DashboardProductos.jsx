@@ -54,6 +54,25 @@ export function DashboardProductos() {
         }
     };
 
+    const handleExportarExcel = async () => {
+        try {
+            // CORREGIDO: Usar 'api' en lugar de 'axios'
+            const response = await api.get('/productos/exportar', {
+                responseType: 'blob' // Esencial para archivos binarios como Excel
+            });
+            
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'inventario_productos.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("Error al exportar Excel de productos:", error);
+        }
+    };
+
     // Crear categoría
     const handleCrearCategoria = async () => {
         const nombre = prompt("Nombre de la nueva categoría:");
@@ -177,7 +196,9 @@ export function DashboardProductos() {
                         className="input-search"
                     />
                 </div>
-
+                    <button onClick={handleExportarExcel} className="btn-confirm">
+                        Exportar Excel
+                    </button>
                     <button className="btn-nuevo-header" onClick={() => openModal()}>
                         <Plus size={18} /> Nuevo Producto
                     </button>

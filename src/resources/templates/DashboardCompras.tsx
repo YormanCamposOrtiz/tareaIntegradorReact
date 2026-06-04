@@ -215,6 +215,28 @@ export function DashboardCompras() {
             }
         }
     };
+
+const handleExportarExcel = async () => {
+        try {
+            // CORREGIDO: Usar los estados reales del componente
+            // Si deseas exportar usando el filtro actual, usamos 'fechaDesde' y 'fechaHasta'
+            // Opcional: Si están vacías, puedes decidir si mandar strings vacíos o alertar al usuario.
+            const response = await api.get(`/compras/exportar?inicio=${fechaDesde}&fin=${fechaHasta}`, {
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `reporte_compras_${fechaDesde || 'inicio'}_a_${fechaHasta || 'fin'}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("Error al exportar Excel de compras:", error);
+        }
+    };
+
     const handleEliminarCompra = async () => {
         if (!compraSeleccionada) {
             alert("Por favor, seleccione una orden de compra de la tabla primero.");
@@ -296,7 +318,7 @@ export function DashboardCompras() {
                             Limpiar Filtro
                         </button>
                     )}
-                    
+                    <button className="btn-buscar" onClick={handleExportarExcel}>Exportar Excel</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
