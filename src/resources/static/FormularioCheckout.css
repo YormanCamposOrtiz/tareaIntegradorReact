@@ -6,6 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  /* Agrega esto para garantizar espacio visual abajo */
+  padding-bottom: 250px; 
 }
 
 .checkout-card {

@@ -184,17 +184,6 @@ export function Perfil() {
                   <span className="option-arrow">→</span>
                 </Link>
 
-                {usuario?.rol === "ADMINISTRADOR" && (
-                  <Link to="/admin/usuarios" className="perfil-option-item">
-                    <div className="option-icon-box"><Shield /></div>
-                    <div className="option-text">
-                      <h3>Gestión de Usuarios</h3>
-                      <p>Administrar base de datos PostgreSQL</p>
-                    </div>
-                    <span className="option-arrow">→</span>
-                  </Link>
-                )}
-
                 <button onClick={() => setView("direcciones")} className="perfil-option-item btn-menu-trigger">
                   <div className="option-icon-box"><MapPin /></div>
                   <div className="option-text">

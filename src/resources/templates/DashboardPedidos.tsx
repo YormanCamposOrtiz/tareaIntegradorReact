@@ -50,7 +50,6 @@ export function DashboardPedidos() {
 
     const fetchPedidos = async (desde?: string, hasta?: string) => {
         try {
-            // Construcción dinámica de la URL con Query Params para fechas si existen
             let url = '/pedidos';
             if (desde && hasta) {
                 url += `?inicio=${desde}&fin=${hasta}`;
@@ -63,7 +62,27 @@ export function DashboardPedidos() {
             console.error("Error al cargar pedidos desde Spring Boot:", error);
         }
     };
+    const descargarExcel = async () => {
+    try {
+        // Si usas filtros de fecha, puedes pasarlos en la URL: /api/pedidos/exportar?inicio=2026-01-01&fin=2026-06-03
+        const response = await api.get('/pedidos/exportar', {
+        responseType: 'blob', // 👈 OBLIGATORIO para indicarle a Axios que procese datos binarios
+        });
 
+        // Crear un enlace temporal de descarga en el DOM
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'reporte_pedidos.xlsx'); // Nombre asignado al archivo local
+        document.body.appendChild(link);
+        link.click();
+        
+        // Limpieza de referencias en memoria
+        link.parentNode.removeChild(link);
+    } catch (error) {
+        console.error("Error al descargar el archivo Excel", error);
+    }
+    };
     const actualizarEstado = async (nuevoEstado: string) => {
         if (!pedidoSeleccionado) {
             alert("Por favor, seleccione un pedido en la tabla superior.");
@@ -137,14 +156,6 @@ export function DashboardPedidos() {
             <div className="ventas-content">
                 {/* SIDEBAR CON LOS MISMOS BOTONES Y DISEÑO DE VENTAS */}
                 <aside className="ventas-sidebar">
-                    <button 
-                        className="btn-actualizar" 
-                        style={{ backgroundColor: '#2980b9', color: 'white' }} 
-                        onClick={() => fetchPedidos(fechaDesde, fechaHasta)}
-                    >
-                        🔄 Actualizar Lista
-                    </button>
-
                     {/* COMBO BOX PARA CONTROL DE FLUJO DE ESTADO */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
                         <label 
@@ -249,7 +260,7 @@ export function DashboardPedidos() {
                             Limpiar Filtro
                         </button>
                     )}
-
+                    <button className="btn-buscar" onClick={descargarExcel}>Descargar Excel</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
