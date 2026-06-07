@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Verifica que sea react-router-dom
-import { Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom"; // Verifica que sea react-router-dom
 import { Lock, User, Heart, Eye, EyeOff, Home , Shield } from "lucide-react";
 
 import { Footer } from './fragments/Footer';
-
 import api from "../../api"; // Tu configuración de axios
 
 import "../static/Login.css";
@@ -99,7 +97,6 @@ return (
 
           {/* 2. TÍTULOS (MediExpress y Panel) */}
           <h1>MediExpress</h1>
-          <p className="login-subtitle">Panel de Administración</p>
 
           <form onSubmit={handleSubmit} className="space-y-1">
             

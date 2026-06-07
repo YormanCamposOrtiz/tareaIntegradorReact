@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, MapPin, Package, Settings, LogOut, Shield, ArrowLeft, Save } from "lucide-react";
+// 🔄 CAMBIO: Se agregó "Loader2" para la animación de carga
+import { User, MapPin, Package, Settings, LogOut, Shield, ArrowLeft, Save, Loader2 } from "lucide-react";
 import axios from "axios";
 
 import { Header } from './fragments/Header';
@@ -15,7 +16,7 @@ interface Usuario {
   correo: string; 
   rol: string; 
   intentos_fallidos: number;
-  direccion?: string; // 🔄 CAMBIO: Agregados opcionales para tipado
+  direccion?: string; 
   telefono?: string;
 }
 
@@ -24,13 +25,15 @@ export function Perfil() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"menu" | "direcciones" | "configuracion">("menu");
   
-  // --- 🔄 CAMBIO: Estados de Dirección Simplificados (Opción A) ---
+  // --- Estados de Dirección ---
   const [direccionForm, setDireccionForm] = useState({ distrito: "", direccionExacta: "" });
   const [mensajeDireccion, setMensajeDireccion] = useState("");
+  const [errorDireccion, setErrorDireccion] = useState(false);
 
   // --- Estados de Configuración ---
   const [configForm, setConfigForm] = useState({ nombre: "", telefono: "", password: "", confirmPassword: "" });
   const [mensajeConfig, setMensajeConfig] = useState("");
+  const [errorConfig, setErrorConfig] = useState(false);
 
   const navigate = useNavigate();
 
@@ -43,19 +46,19 @@ export function Perfil() {
       return;
     }
     
-    // Carga inicial del usuario desde la base de datos
+    // Capturamos el momento exacto en que inicia la carga
+    const tiempoInicio = Date.now();
+    
     axios.get(`http://localhost:8080/api/auth/buscar?correo=${userEmail}`)
       .then((res) => {
         setUsuario(res.data);
         
-        // 🔄 CAMBIO: Inicializar los formularios con la data real que viene de NeonTech
         setConfigForm(prev => ({ 
           ...prev, 
           nombre: res.data.nombre, 
           telefono: res.data.telefono || "" 
         }));
 
-        // Si ya hay una dirección, intentar separarla por la coma para rellenar los inputs
         if (res.data.direccion) {
           const partes = res.data.direccion.split(", ");
           setDireccionForm({
@@ -64,11 +67,18 @@ export function Perfil() {
           });
         }
         
-        setLoading(false);
+        // 🔄 CAMBIO: Calcular cuánto tardó la petición para mantener el loader por un mínimo de 1.5 segundos
+        const tiempoTranscurrido = Date.now() - tiempoInicio;
+        const tiempoRestante = Math.max(250 - tiempoTranscurrido, 0);
+
+        setTimeout(() => {
+          setLoading(false);
+        }, tiempoRestante);
       })
       .catch((err) => {
         console.error("Error al conectar con PostgreSQL:", err);
-        loading && setLoading(false);
+        // En caso de error también respetamos una pequeña espera antes de quitar el loading
+        setTimeout(() => setLoading(false), 100);
       });
   }, [navigate]);
 
@@ -79,36 +89,78 @@ export function Perfil() {
     navigate("/login");
   };
 
-  // --- 🔄 CAMBIO: Guardar Dirección única en NeonTech ---
+  // --- 🛠️ VALIDACIONES Y ENVÍO DE DIRECCIÓN ---
   const handleGuardarDireccion = (e: React.FormEvent) => {
     e.preventDefault();
     if (!usuario) return;
 
-    // Unificamos el texto como "Av. Siempre Viva 123, Surco"
-    const direccionCompleta = `${direccionForm.direccionExacta}, ${direccionForm.distrito}`;
+    const distritoClean = direccionForm.distrito.trim();
+    const direccionExactaClean = direccionForm.direccionExacta.trim();
+
+    if (distritoClean.length < 3 || direccionExactaClean.length < 5) {
+      setErrorDireccion(true);
+      setMensajeDireccion("❌ Por favor, ingresa datos de dirección más específicos.");
+      return;
+    }
+
+    const regexValido = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ .,#°-]+$/;
+    if (!regexValido.test(distritoClean) || !regexValido.test(direccionExactaClean)) {
+      setErrorDireccion(true);
+      setMensajeDireccion("❌ La dirección contiene caracteres no permitidos.");
+      return;
+    }
+
+    const direccionCompleta = `${direccionExactaClean}, ${distritoClean}`;
 
     axios.put(`http://localhost:8080/api/perfil/${usuario.id}/datos`, {
       direccion: direccionCompleta
     })
     .then((res) => {
-      setUsuario(res.data); // Sincronizamos estado global del componente
+      setUsuario(res.data);
+      setErrorDireccion(false);
       setMensajeDireccion("✅ Dirección de entrega guardada en la base de datos.");
       setTimeout(() => setMensajeDireccion(""), 3000);
     })
     .catch((err) => {
       console.error("Error al guardar dirección:", err);
+      setErrorDireccion(true);
       setMensajeDireccion("❌ Error al conectar con el servidor.");
     });
   };
 
-  // --- 🔄 CAMBIO: Guardar Configuración Personal y Contraseña Encriptada ---
+  // --- 🛠️ VALIDACIONES Y ENVÍO DE CONFIGURACIÓN ---
   const handleGuardarConfig = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!usuario) return;
 
-    // 1. Validar cambio de contraseña si el usuario escribió algo
+    const nombreClean = configForm.nombre.trim();
+    const telefonoClean = configForm.telefono.trim();
+
+    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/;
+    if (nombreClean.length < 3 || !regexNombre.test(nombreClean)) {
+      setErrorConfig(true);
+      setMensajeConfig("❌ El nombre debe contener solo letras y tener al menos 3 caracteres.");
+      return;
+    }
+
+    if (telefonoClean) {
+      const regexTelefono = /^9\d{8}$/;
+      if (!regexTelefono.test(telefonoClean)) {
+        setErrorConfig(true);
+        setMensajeConfig("❌ El número de teléfono debe ser un celular válido de 9 dígitos (debe empezar con 9).");
+        return;
+      }
+    }
+
     if (configForm.password) {
+      if (configForm.password.length < 8) {
+        setErrorConfig(true);
+        setMensajeConfig("❌ La nueva contraseña debe tener al menos 8 caracteres.");
+        return;
+      }
+
       if (configForm.password !== configForm.confirmPassword) {
+        setErrorConfig(true);
         setMensajeConfig("❌ Las contraseñas no coinciden");
         return;
       }
@@ -119,31 +171,56 @@ export function Perfil() {
         });
       } catch (err) {
         console.error("Error al encriptar/cambiar contraseña:", err);
+        setErrorConfig(true);
         setMensajeConfig("❌ Error al actualizar la contraseña.");
         return;
       }
     }
 
-    // 2. Guardar Datos Personales (Nombre y Teléfono)
     axios.put(`http://localhost:8080/api/perfil/${usuario.id}/datos`, {
-      nombre: configForm.nombre,
-      telefono: configForm.telefono
+      nombre: nombreClean,
+      telefono: telefonoClean || null
     })
     .then((res) => {
-      setUsuario(res.data); // Actualiza la cabecera (Avatar/Nombre) en caliente
+      setUsuario(res.data);
+      setErrorConfig(false);
       setMensajeConfig("✅ ¡Cambios guardados con éxito en NeonTech!");
-      // Limpiamos los campos de password
       setConfigForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
       setTimeout(() => setMensajeConfig(""), 3000);
     })
     .catch((err) => {
       console.error("Error al actualizar datos:", err);
+      setErrorConfig(true);
       setMensajeConfig("❌ Error al guardar datos personales.");
     });
   };
 
+  // 🔄 CAMBIO: Vista HTML mejorada para el estado de carga (Loading)
   if (loading) {
-    return <div className="loading-container">Cargando datos del perfil...</div>;
+    return (
+      <div className="loading-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        gap: '15px',
+        backgroundColor: '#f9fafb'
+      }}>
+        <Loader2 size={48} className="spinner-icon" style={{
+          color: '#f37907',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <p style={{
+          color: '#63564b',
+          fontSize: '1.1rem',
+          fontWeight: 500,
+          fontFamily: 'sans-serif'
+        }}>
+          Cargando tu perfil...
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -204,12 +281,16 @@ export function Perfil() {
               </div>
             )}
 
-            {/* 🔄 VISTA 2 CONFIGURADA: DIRECCIÓN ÚNICA */}
+            {/* VISTA 2: DIRECCIÓN ÚNICA */}
             {view === "direcciones" && (
               <div className="subview-container">
                 <h2 className="subview-title">📍 Mi Dirección de Envío</h2>
                 
-                {mensajeDireccion && <div className="mensaje-alerta-config">{mensajeDireccion}</div>}
+                {mensajeDireccion && (
+                  <div className={`mensaje-alerta-config ${errorDireccion ? "error-text" : "success-text"}`}>
+                    {mensajeDireccion}
+                  </div>
+                )}
 
                 <form onSubmit={handleGuardarDireccion} className="subview-form">
                   <h3>🏠 Actualizar Lugar de Entrega Frecuente</h3>
@@ -226,6 +307,7 @@ export function Perfil() {
                         value={direccionForm.distrito}
                         onChange={e => setDireccionForm({...direccionForm, distrito: e.target.value})}
                         required 
+                        maxLength={50}
                       />
                     </div>
                   </div>
@@ -237,6 +319,7 @@ export function Perfil() {
                     value={direccionForm.direccionExacta}
                     onChange={e => setDireccionForm({...direccionForm, direccionExacta: e.target.value})}
                     required 
+                    maxLength={100}
                   />
 
                   <button type="submit" className="btn-submit-subview">
@@ -251,7 +334,11 @@ export function Perfil() {
               <div className="subview-container">
                 <h2 className="subview-title">⚙️ Ajustes de Cuenta y Seguridad</h2>
                 
-                {mensajeConfig && <div className="mensaje-alerta-config">{mensajeConfig}</div>}
+                {mensajeConfig && (
+                  <div className={`mensaje-alerta-config ${errorConfig ? "error-text" : "success-text"}`}>
+                    {mensajeConfig}
+                  </div>
+                )}
 
                 <form onSubmit={handleGuardarConfig} className="subview-form">
                   <h3>🔒 Actualizar Datos Personales</h3>
@@ -259,8 +346,12 @@ export function Perfil() {
                   <input 
                     type="text" 
                     value={configForm.nombre}
-                    onChange={e => setConfigForm({...configForm, nombre: e.target.value})}
+                    onChange={e => {
+                      const soloLetras = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, "");
+                      setConfigForm({...configForm, nombre: soloLetras});
+                    }}
                     required
+                    maxLength={60}
                   />
 
                   <label>Número de Teléfono</label>
@@ -268,16 +359,21 @@ export function Perfil() {
                     type="tel" 
                     placeholder="Ej: 987654321"
                     value={configForm.telefono}
-                    onChange={e => setConfigForm({...configForm, telefono: e.target.value})}
+                    onChange={e => {
+                      const soloNumeros = e.target.value.replace(/\D/g, "");
+                      setConfigForm({...configForm, telefono: soloNumeros});
+                    }}
+                    maxLength={9}
                   />
 
                   <h3 style={{ marginTop: '25px' }}>🔑 Cambiar Contraseña</h3>
                   <label>Nueva Contraseña</label>
                   <input 
                     type="password" 
-                    placeholder="Escribe tu nueva clave"
+                    placeholder="Mínimo 8 caracteres"
                     value={configForm.password}
                     onChange={e => setConfigForm({...configForm, password: e.target.value})}
+                    maxLength={32}
                   />
 
                   <label>Confirmar Nueva Contraseña</label>
@@ -286,6 +382,7 @@ export function Perfil() {
                     placeholder="Repite tu nueva clave"
                     value={configForm.confirmPassword}
                     onChange={e => setConfigForm({...configForm, confirmPassword: e.target.value})}
+                    maxLength={32}
                   />
 
                   <button type="submit" className="btn-submit-subview save-btn">
