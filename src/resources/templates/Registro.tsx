@@ -18,27 +18,27 @@ export function Registro() {
     rol: "Usuario"
   });
   const [error, setError] = useState("");
-
-  const [passwordCriteria, setPasswordCriteria] = useState({
-    length: false,
-    uppercase: false,
-    number: false,
-    specialChar: false,
-  });
-
-  // Función para validar la contraseña en tiempo real
-  const handlePasswordChange = (password: string) => {
-    setFormData({ ...formData, contrasena: password });
-
-    // Evaluamos los requisitos uno a uno
-    setPasswordCriteria({
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      number: /\d/.test(password),
-      specialChar: /[@$!%*?&._#\-+=¿¡]/.test(password),
-    });
-  };
   
+    // Estado para rastrear qué requisitos se van cumpliendo en tiempo real
+    const [passwordCriteria, setPasswordCriteria] = useState({
+        length: false,
+        uppercase: false,
+        number: false,
+        specialChar: false,
+    });
+
+    // Función para validar la contraseña en tiempo real mientras se digita
+    const handlePasswordChange = (password: string) => {
+        setFormData({ ...formData, contrasena: password });
+
+        setPasswordCriteria({
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /\d/.test(password),
+            specialChar: /[@$!%*?&._#\-+=¿¡]/.test(password),
+        });
+    };
+
   // 1. Validar criterios de contraseña
   const esContrasenaValida = 
     passwordCriteria.length && 
@@ -132,27 +132,24 @@ export function Registro() {
             <div style={{ marginBottom: '6px' }}>
               <label className="login-label">Correo Electrónico</label>
               <div className="input-group">
-                <input
-                  type="email"
-                  className="login-input"
-                  placeholder="tu@correo.com"
-                  value={formData.correo}
-                  onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
-                  required
-                />
+                <input 
+                        type="email" 
+                        className="login-input" 
+                        placeholder="Correo" 
+                        value={formData.correo}
+                        onChange={(e) => setFormData({...formData, correo: e.target.value})} 
+                    />
                 <Mail className="input-icon" />
               </div>
             </div> 
+            <label className="login-label">Password</label>
 
-            {/* CAMPO CONTRASEÑA CON OJITO */}
-            <div>
-              <label className="login-label">Contraseña</label>
-              <div className="input-group relative">
+            <div className="input-group relative mb-4">
                 <input
-                  type={showPassword ? "text" : "password"} 
-                  className="login-input"
-                  style={{ paddingRight: '45px', marginBottom: '-10px' }} 
-                  placeholder="Mínimo 8 caracteres"
+                  type={showPassword ? "text" : "password"}
+                  className="login-input w-full"
+                  style={{ paddingRight: '45px' }} // Espacio para que el texto no tape el ojo
+                  placeholder="Contraseña"
                   value={formData.contrasena}
                   onChange={(e) => handlePasswordChange(e.target.value)}
                   required
@@ -170,23 +167,23 @@ export function Registro() {
                 </button>
               </div>
 
-              {/* CRITERIOS DE CONTRASEÑA */}
-              <div className="password-criteria mt-1.5 text-left text-[9px] space-y-0.2 bg-gray-50/50 p-1.5 rounded border border-gray-100/50" style={{ marginBottom: '-20px' }}>
-                
-                <p className={`${passwordCriteria.length ? "text-green-600 font-medium" : "text-gray-400"} flex items-left gap-1`} style={{ marginBottom: '-10px' }}>
-                  <span>{passwordCriteria.length ? "✓" : "○"}</span> Mínimo 8 caracteres
-                </p>
-                <p className={`${passwordCriteria.uppercase ? "text-green-600 font-medium" : "text-gray-400"} flex items-left gap-1`} style={{ marginBottom: '-10px' }}>
-                  <span>{passwordCriteria.uppercase ? "✓" : "○"}</span> Debe tener alguna mayúscula
-                </p>
-                <p className={`${passwordCriteria.number ? "text-green-600 font-medium" : "text-gray-400"} flex items-left gap-1`} style={{ marginBottom: '-10px' }}>
-                  <span>{passwordCriteria.number ? "✓" : "○"}</span> Debe tener algún número
-                </p>
-                <p className={`${passwordCriteria.specialChar ? "text-green-600 font-medium" : "text-gray-400"} flex items-left gap-1`} >
-                  <span>{passwordCriteria.specialChar ? "✓" : "○"}</span> Debe tener algún signo especial
-                </p>
-              </div>
-            </div>         
+              {/* CRITERIOS DE CONTRASEÑA EN TAMAÑO REDUCIDO */}
+                    {formData.contrasena.length > 0 && (
+                        <div className="password-criteria mb-4 text-left text-[11px] space-y-0.5 bg-gray-50/50 p-1.5 rounded border border-gray-100/50">
+                            <p className={`${passwordCriteria.length ? "text-green-600 font-medium" : "text-gray-400"} flex items-center gap-1`}>
+                                <span>{passwordCriteria.length ? "✓" : "○"}</span> Mínimo 8 caracteres
+                            </p>
+                            <p className={`${passwordCriteria.uppercase ? "text-green-600 font-medium" : "text-gray-400"} flex items-center gap-1`}>
+                                <span>{passwordCriteria.uppercase ? "✓" : "○"}</span> Al menos una mayúscula
+                            </p>
+                            <p className={`${passwordCriteria.number ? "text-green-600 font-medium" : "text-gray-400"} flex items-center gap-1`}>
+                                <span>{passwordCriteria.number ? "✓" : "○"}</span> Al menos un número
+                            </p>
+                            <p className={`${passwordCriteria.specialChar ? "text-green-600 font-medium" : "text-gray-400"} flex items-center gap-1`}>
+                                <span>{passwordCriteria.specialChar ? "✓" : "○"}</span> Al menos un signo (@$!%*?&.)
+                            </p>
+                        </div>
+                    )}         
 
             {/* 🔄 CAMBIO: Ahora evalúa "formularioCompleto" en lugar de solo la contraseña */}
             <button 
