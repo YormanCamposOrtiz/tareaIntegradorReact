@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { DashboardHeader } from './fragments/DashboardHeader';
 import api from "../../api"; 
 
-// Importación corregida según tu estructura de carpetas
 import "../static/DashboardPedidos.css";
 import "../static/DashboardVentas.css";
 import "../static/RegistrarMovimiento.css";
@@ -11,11 +10,10 @@ import "../static/RegistrarMovimiento.css";
 interface DetallePedido {
     id?: number;
     cantidad: number;
-    // Agregamos el producto mapeado tal como viene de la base de datos
     producto?: {
         id: number;
         nombre: string;
-        precio_venta: number; // 👈 Los pedidos suelen jalar el precio directo del catálogo
+        precio_venta: number; 
     };
 }
 
@@ -29,9 +27,8 @@ interface Pedido {
     fecha: string;
     total: number;
     estado: string; // PENDIENTE, PREPARANDO, ENVIADO, ENTREGADO, CANCELADO
-    detalles?: DetallePedido[]; // 👈 Los detalles del pedido
+    detalles?: DetallePedido[]; 
 }
-
 
 export function DashboardPedidos() {
     const navigate = useNavigate();
@@ -62,27 +59,71 @@ export function DashboardPedidos() {
             console.error("Error al cargar pedidos desde Spring Boot:", error);
         }
     };
-    const descargarExcel = async () => {
-    try {
-        // Si usas filtros de fecha, puedes pasarlos en la URL: /api/pedidos/exportar?inicio=2026-01-01&fin=2026-06-03
-        const response = await api.get('/pedidos/exportar', {
-        responseType: 'blob', // 👈 OBLIGATORIO para indicarle a Axios que procese datos binarios
-        });
 
-        // Crear un enlace temporal de descarga en el DOM
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'reporte_pedidos.xlsx'); // Nombre asignado al archivo local
-        document.body.appendChild(link);
-        link.click();
-        
-        // Limpieza de referencias en memoria
-        link.parentNode.removeChild(link);
-    } catch (error) {
-        console.error("Error al descargar el archivo Excel", error);
-    }
+    // FUNCIÓN PARA DESCARGAR EL REPORTE EN PDF (CORREGIDA)
+    const descargarReportePdf = async (endpoint: string, nombreArchivo: string) => {
+        try {
+            const token = localStorage.getItem("token"); // Obtenemos tu Token JWT
+
+            // Si hay filtros de fecha aplicados, los añadimos al endpoint del PDF
+            let urlFinal = endpoint;
+            if (fechaDesde && fechaHasta) {
+                urlFinal += `?inicio=${fechaDesde}&fin=${fechaHasta}`;
+            }
+
+            const response = await api.get(urlFinal, {
+                responseType: 'blob', // OBLIGATORIO para leer flujos binarios de PDF
+                headers: {
+                    'Authorization': `Bearer ${token}` // Evita el error 403 Forbidden
+                }
+            });
+
+            // Crear una URL del objeto binario del PDF
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', nombreArchivo); 
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpiar el DOM de forma segura
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error al descargar el archivo PDF:", error);
+            alert("No se pudo generar el documento PDF. Comprueba tus accesos.");
+        }
     };
+
+    const descargarExcel = async () => {
+        try {
+            let url = '/pedidos/exportar';
+            if (fechaDesde && fechaHasta) {
+                url += `?inicio=${fechaDesde}&fin=${fechaHasta}`;
+            }
+
+            const response = await api.get(url, {
+                responseType: 'blob', // OBLIGATORIO para procesar datos binarios
+            });
+
+            const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = urlBlob;
+            link.setAttribute('download', 'reporte_pedidos.xlsx'); 
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpieza segura en el DOM
+            link.remove();
+            window.URL.revokeObjectURL(urlBlob);
+        } catch (error) {
+            console.error("Error al descargar el archivo Excel", error);
+            alert("No se pudo descargar el reporte en Excel.");
+        }
+    };
+
     const actualizarEstado = async (nuevoEstado: string) => {
         if (!pedidoSeleccionado) {
             alert("Por favor, seleccione un pedido en la tabla superior.");
@@ -129,7 +170,6 @@ export function DashboardPedidos() {
         }
     };
 
-    // Ejecutar búsqueda por fechas
     const handleBuscarPorFechas = () => {
         if (!fechaDesde || !fechaHasta) {
             alert("Por favor, seleccione ambas fechas para aplicar el filtro.");
@@ -142,21 +182,19 @@ export function DashboardPedidos() {
         fetchPedidos(fechaDesde, fechaHasta);
     };
 
-    // Restablecer el panel
     const handleLimpiarFiltro = () => {
         setFechaDesde('');
         setFechaHasta('');
-        fetchPedidos(); // Carga el historial completo
+        fetchPedidos(); 
     };
 
     return (
-        <div className="ventas-container"> {/* Usa el mismo container de ventas */}
+        <div className="ventas-container"> 
             <DashboardHeader />
 
             <div className="ventas-content">
-                {/* SIDEBAR CON LOS MISMOS BOTONES Y DISEÑO DE VENTAS */}
+                {/* SIDEBAR CON CONTROLES */}
                 <aside className="ventas-sidebar">
-                    {/* COMBO BOX PARA CONTROL DE FLUJO DE ESTADO */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
                         <label 
                             htmlFor="estado-pedido" 
@@ -178,33 +216,28 @@ export function DashboardPedidos() {
                                     : pedidoSeleccionado.estado === 'PREPARANDO' ? '#f39c12'
                                     : pedidoSeleccionado.estado === 'ENVIADO' ? '#3498db'
                                     : pedidoSeleccionado.estado === 'ENTREGADO' ? '#2ecc71'
-                                    : '#34495e', // Color por defecto (ej. PENDIENTE)
+                                    : '#34495e', 
                                 color: 'white',
                                 cursor: pedidoSeleccionado ? 'pointer' : 'not-allowed',
                                 outline: 'none',
                                 transition: 'background-color 0.3s ease'
                             }}
                             disabled={!pedidoSeleccionado}
-                            // Tomamos el valor actual del pedido seleccionado, si no hay, se muestra vacío
                             value={pedidoSeleccionado?.estado || ""}
-                            // Cuando el usuario cambia la opción, gatilla tu función de actualización de Spring Boot
                             onChange={(e) => {
                                 if (e.target.value) {
                                     actualizarEstado(e.target.value);
                                 }
                             }}
                         >
-                            {/* Opción por defecto cuando no hay selección */}
                             {!pedidoSeleccionado && <option value="">Seleccione un pedido...</option>}
                             
-                            {/* Si hay un pedido pendiente, mostramos su opción correspondiente */}
                             {pedidoSeleccionado?.estado === 'PENDIENTE' && (
                                 <option value="PENDIENTE" style={{ color: '#34495e', backgroundColor: 'white' }}>
                                     ⏳ Pendiente
                                 </option>
                             )}
 
-                            {/* Opciones del flujo */}
                             <option value="PREPARANDO" style={{ color: '#f39c12', backgroundColor: 'white' }}>
                                 👨‍🍳 Preparando
                             </option>
@@ -214,7 +247,6 @@ export function DashboardPedidos() {
                             <option value="ENTREGADO" style={{ color: '#2ecc71', backgroundColor: 'white' }}>
                                 ✅ Entregado
                             </option>
-
                         </select>
                     </div>
 
@@ -232,7 +264,7 @@ export function DashboardPedidos() {
                         Cancelar Pedido
                     </button>
 
-                    {/* SECCIÓN DEL FILTRO DE FECHAS EN PEDIDOS */}
+                    {/* SECCIÓN DEL FILTRO DE FECHAS */}
                     <div className="filter-group" style={{ marginTop: '15px' }}>
                         <label>Desde:</label>
                         <input 
@@ -250,7 +282,6 @@ export function DashboardPedidos() {
 
                     <button className="btn-buscar" onClick={handleBuscarPorFechas}>Buscar</button>
 
-                    {/* Botón dinámico para limpiar la búsqueda */}
                     {(fechaDesde || fechaHasta) && (
                         <button 
                             className="btn-buscar" 
@@ -261,12 +292,13 @@ export function DashboardPedidos() {
                         </button>
                     )}
                     <button className="btn-buscar" onClick={descargarExcel}>Descargar Excel</button>
+                    {/* CORRECCIÓN AQUÍ: Cambiado de /productos/exportar-pdf a /pedidos/exportar-pdf */}
+                    <button onClick={() => descargarReportePdf('/pedidos/exportar-pdf', 'reporte_pedidos.pdf')} className="btn-pdf">Exportar a PDF</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
                 {/* CUERPO PRINCIPAL CON TABLAS */}
                 <main className="ventas-main">
-                    {/* TABLA PRINCIPAL DE PEDIDOS SOLICITADOS */}
                     <div className="table-wrapper">
                         <h3>Historial de Pedidos Web</h3>
                         <table>
@@ -288,7 +320,6 @@ export function DashboardPedidos() {
                                     pedidos.map(p => {
                                         const isSelected = pedidoSeleccionado?.id === p.id;
                                         
-                                        // Estilo de color dinámico según el estado del pedido
                                         let estadoColor = '#7f8c8d';
                                         if (p.estado === 'PENDIENTE') estadoColor = '#e67e22';
                                         if (p.estado === 'PREPARANDO') estadoColor = '#f1c40f';
@@ -324,7 +355,6 @@ export function DashboardPedidos() {
                         </table>
                     </div>
 
-                    {/* TABLA INFERIOR: DETALLES DEL PEDIDO SELECCIONADO */}
                     <div className="table-wrapper">
                         <h3>
                             {pedidoSeleccionado
@@ -356,7 +386,6 @@ export function DashboardPedidos() {
                                     </tr>
                                 ) : (
                                     pedidoSeleccionado.detalles.map((d, index) => {
-                                        // 💡 Extracción segura usando la nueva interfaz DetallePedido
                                         const precUnit = d.producto?.precio_venta || 0;
                                         const subT = precUnit * d.cantidad;
                                         

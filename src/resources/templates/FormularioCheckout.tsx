@@ -123,9 +123,6 @@ export function FormularioCheckout({
               <label>Puede Recogerlo en la tienda</label><br />
               <label>Dirección exacta: Av. Los Incas 777 - Comas</label>   
             </div>
-            
-            
-          
         )}
       </div>
 
