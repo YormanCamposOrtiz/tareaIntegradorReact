@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// CORREGIDO: Se agregó 'Eye' a las importaciones de lucide-react
-import { Home, Heart, Plus, Trash2, Edit, X, Package, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit, X, Eye } from 'lucide-react';
 
 import { DashboardHeader } from './fragments/DashboardHeader';
 import "../static/DashboardProductos.css";
@@ -54,9 +53,39 @@ export function DashboardProductos() {
         }
     };
 
+    // FUNCIÓN PARA DESCARGAR EL REPORTE EN PDF (CORREGIDA: Se removieron tipos de TypeScript de los parámetros)
+    const descargarReportePdf = async (endpoint, nombreArchivo) => {
+        try {
+            const token = localStorage.getItem("token"); // Obtenemos tu Token JWT
+
+            const response = await api.get(endpoint, {
+                responseType: 'blob', // OBLIGATORIO para leer flujos binarios de PDF
+                headers: {
+                    'Authorization': `Bearer ${token}` // Evita el error 403 Forbidden
+                }
+            });
+
+            // Crear una URL del objeto binario del PDF
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', nombreArchivo); 
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpiar el DOM
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error al descargar el archivo PDF:", error);
+            alert("No se pudo generar el documento PDF. Comprueba tus accesos.");
+        }
+    };
+
     const handleExportarExcel = async () => {
         try {
-            // CORREGIDO: Usar 'api' en lugar de 'axios'
             const response = await api.get('/productos/exportar', {
                 responseType: 'blob' // Esencial para archivos binarios como Excel
             });
@@ -187,21 +216,26 @@ export function DashboardProductos() {
 
                 <div className="table-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
 
-                <div className="search-container">
-                    <input
-                        type="text"
-                        placeholder="Buscar producto por nombre..."
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                        className="input-search"
-                    />
-                </div>
-                    <button onClick={handleExportarExcel} className="btn-confirm">
-                        Exportar Excel
-                    </button>
-                    <button className="btn-nuevo-header" onClick={() => openModal()}>
-                        <Plus size={18} /> Nuevo Producto
-                    </button>
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Buscar producto por nombre..."
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                            className="input-search"
+                        />
+                    </div>
+                    <div>
+                        <button onClick={handleExportarExcel} className="btn-confirm" style={{ marginRight: '0.5rem' }}>
+                            Exportar Excel
+                        </button>
+                        <button onClick={() => descargarReportePdf('/productos/exportar-pdf', 'Inventario.pdf')} className="btn-confirm" style={{ marginRight: '0.5rem' }}>
+                            Exportar a PDF
+                        </button>
+                        <button className="btn-confirm" onClick={() => openModal()}>
+                            <Plus size={18} /> Nuevo Producto
+                        </button>
+                    </div>
                 </div>
 
                 <div className="table-wrapper">

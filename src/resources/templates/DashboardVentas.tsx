@@ -27,7 +27,7 @@ interface DashboardVentas {
     } | null;
     fecha: string;
     total: number;
-    detalles?: DetalleVenta[]; // 👈 Agregamos los detalles a la interfaz de la Venta
+    detalles?: DetalleVenta[]; 
 }
 
 interface Categoria {
@@ -53,6 +53,7 @@ interface ItemCarrito {
     subTotal: number;
 }
 
+
 export function DashboardVentas() {
     const navigate = useNavigate();
     
@@ -60,7 +61,7 @@ export function DashboardVentas() {
     const [ventas, setVentas] = useState<DashboardVentas[]>([]);
     const [productos, setProductos] = useState<Producto[]>([]);
     
-    // 💡 NUEVO ESTADO: Guarda la venta de la que queremos ver sus productos
+    // Guarda la venta de la que queremos ver sus productos
     const [ventaSeleccionada, setVentaSeleccionada] = useState<DashboardVentas | null>(null);
     
     // Estados del modal de registro de ventas
@@ -77,22 +78,22 @@ export function DashboardVentas() {
     }, []);
 
     const fetchDatos = async (desde?: string, hasta?: string) => {
-    try {
-        const prodResponse = await api.get('/productos');
-        setProductos(prodResponse.data);
-        
-        // Construcción dinámica de la URL con Query Params
-        let url = '/ventas';
-        if (desde && hasta) {
-            url += `?inicio=${desde}&fin=${hasta}`;
+        try {
+            const prodResponse = await api.get('/productos');
+            setProductos(prodResponse.data);
+            
+            // Construcción dinámica de la URL con Query Params
+            let url = '/ventas';
+            if (desde && hasta) {
+                url += `?inicio=${desde}&fin=${hasta}`;
+            }
+            
+            const ventasResponse = await api.get(url);
+            setVentas(ventasResponse.data);
+            setVentaSeleccionada(null);
+        } catch (error) {
+            console.error("Error al cargar datos desde Spring Boot:", error);
         }
-        
-        const ventasResponse = await api.get(url);
-        setVentas(ventasResponse.data);
-        setVentaSeleccionada(null);
-    } catch (error) {
-        console.error("Error al cargar datos desde Spring Boot:", error);
-    }
     };
 
     const agregarAlCarrito = (prod: Producto) => {
@@ -135,23 +136,60 @@ export function DashboardVentas() {
         setCarrito(carrito.filter(item => item.id !== id));
     };
 
-    const handleExportarExcel = async () => {
+    // FUNCIÓN PARA DESCARGAR EL REPORTE EN PDF (CORREGIDA)
+    const descargarReportePdf = async (endpoint: string, nombreArchivo: string) => {
         try {
-            // CORREGIDO: Asegurar que apunte a los estados de fecha de este componente
-            // Si no usas filtros de fecha en ventas, puedes llamar a la ruta limpia: '/api/ventas/exportar'
-            const response = await api.get('/ventas/exportar', { 
-                responseType: 'blob'
+            const token = localStorage.getItem("token"); // Obtenemos tu Token JWT
+
+            const response = await api.get(endpoint, {
+                responseType: 'blob', // OBLIGATORIO para leer flujos binarios de PDF
+                headers: {
+                    'Authorization': `Bearer ${token}` // Evita el error 403 Forbidden
+                }
             });
 
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            // Crear una URL del objeto binario del PDF
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', nombreArchivo); 
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpiar el DOM
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error al descargar el archivo PDF:", error);
+            alert("No se pudo generar el documento PDF. Comprueba tus accesos.");
+        }
+    };
+
+    // FUNCIÓN PARA EXPORTAR EXCEL (CORREGIDA CON INYECCIÓN DE TOKEN JWT)
+    const handleExportarExcel = async () => {
+        try {
+            const token = localStorage.getItem("token"); // Se agrega el token para evitar el 403
+
+            const response = await api.get('/ventas/exportar', { 
+                responseType: 'blob',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', 'reporte_ventas.xlsx');
             document.body.appendChild(link);
             link.click();
             link.remove();
+            window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Error al exportar Excel de ventas:", error);
+            alert("No se pudo generar el reporte de Excel. Verifique sus permisos.");
         }
     };
 
@@ -207,35 +245,32 @@ export function DashboardVentas() {
     };
 
     const handleEliminarVenta = async () => {
-    if (!ventaSeleccionada) return;
+        if (!ventaSeleccionada) return;
 
-    // Preguntar siempre confirmación antes de una acción destructiva
-    const confirmar = window.confirm(
-        `¿Está completamente seguro de que desea ANULAR la venta #${String(ventaSeleccionada.id).padStart(3, '0')}?\n` +
-        `Esto devolverá los productos vendidos directamente al stock actual.`
-    );
+        const confirmar = window.confirm(
+            `¿Está completamente seguro de que desea ANULAR la venta #${String(ventaSeleccionada.id).padStart(3, '0')}?\n` +
+            `Esto devolverá los productos vendidos directamente al stock actual.`
+        );
 
-    if (!confirmar) return;
+        if (!confirmar) return;
 
-    try {
-        // Petición HTTP DELETE al backend de Spring Boot
-        const response = await api.delete(`/ventas/${ventaSeleccionada.id}`);
-        
-        if (response.status === 200) {
-            alert("¡Venta anulada correctamente! El inventario ha sido restablecido.");
-            // Refrescar la lista de ventas y limpiar la selección actual
-            fetchDatos(); 
+        try {
+            const response = await api.delete(`/ventas/${ventaSeleccionada.id}`);
+            
+            if (response.status === 200) {
+                alert("¡Venta anulada correctamente! El inventario ha sido restablecido.");
+                fetchDatos(); 
+            }
+        } catch (err: any) {
+            console.error("Error al eliminar la venta:", err);
+            if (err.response && err.response.data) {
+                alert(`Error en el servidor: ${err.response.data.message || 'No se pudo anular la venta.'}`);
+            } else {
+                alert("Hubo un problema de conexión al intentar anular la venta.");
+            }
         }
-    } catch (err: any) {
-        console.error("Error al eliminar la venta:", err);
-        if (err.response && err.response.data) {
-            alert(`Error en el servidor: ${err.response.data.message || 'No se pudo anular la venta.'}`);
-        } else {
-            alert("Hubo un problema de conexión al intentar anular la venta.");
-        }}
     };
 
-    // Ejecutar búsqueda por fechas
     const handleBuscarPorFechas = () => {
         if (!fechaDesde || !fechaHasta) {
             alert("Por favor, seleccione ambas fechas para aplicar el filtro.");
@@ -248,11 +283,10 @@ export function DashboardVentas() {
         fetchDatos(fechaDesde, fechaHasta);
     };
 
-    // Restablecer el panel
     const handleLimpiarFiltro = () => {
         setFechaDesde('');
         setFechaHasta('');
-        fetchDatos(); // Carga el historial completo
+        fetchDatos(); 
     };
     
     const productosFiltrados = busqueda === '' ? [] : productos.filter(p => 
@@ -281,7 +315,6 @@ export function DashboardVentas() {
                         Anular Venta
                     </button>
 
-                    {/* SECCIÓN DEL FILTRO DE FECHAS EN VENTAS */}
                     <div className="filter-group" style={{ marginTop: '15px' }}>
                         <label>Desde:</label>
                         <input 
@@ -299,7 +332,6 @@ export function DashboardVentas() {
 
                     <button className="btn-buscar" onClick={handleBuscarPorFechas}>Buscar</button>
 
-                    {/* Botón dinámico para limpiar la búsqueda */}
                     {(fechaDesde || fechaHasta) && (
                         <button 
                             className="btn-buscar" 
@@ -311,11 +343,12 @@ export function DashboardVentas() {
                     )}
 
                     <button className="btn-buscar" onClick={handleExportarExcel}>Exportar Excel</button>
+                    {/* CORREGIDO: Apunta al endpoint correcto de ventas en lugar de productos */}
+                    <button onClick={() => descargarReportePdf('/ventas/exportar-pdf', 'Reporte_Ventas.pdf')} className="btn-pdf">Exportar a PDF</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
                 <main className="ventas-main">
-                    {/* TABLA PRINCIPAL DE HISTORIAL DE VENTAS REALES */}
                     <div className="table-wrapper">
                         <h3>Historial de Ventas</h3>
                         <table>
@@ -334,16 +367,15 @@ export function DashboardVentas() {
                                     </tr>
                                 ) : (
                                     ventas.map(v => {
-                                        // Validar si esta fila es la seleccionada para añadirle estilos visuales (CSS)
                                         const isSelected = ventaSeleccionada?.id === v.id;
                                         return (
                                             <tr 
                                                 key={v.id} 
-                                                onClick={() => setVentaSeleccionada(v)} // 💡 Al hacer clic, guardamos la venta completa
+                                                onClick={() => setVentaSeleccionada(v)} 
                                                 style={{ 
                                                     cursor: 'pointer', 
                                                     backgroundColor: isSelected ? '#ebf5fb' : '',
-                                                    fontWeight: isSelected ? '5px' : 'normal'
+                                                    fontWeight: isSelected ? 'bold' : 'normal'
                                                 }}
                                                 className={isSelected ? "fila-seleccionada" : ""}
                                             >
@@ -361,7 +393,6 @@ export function DashboardVentas() {
                         </table>
                     </div>
                     
-                    {/* TABLA INFERIOR: DETALLES DE LA VENTA SELECCIONADA */}
                     <div className="table-wrapper">
                         <h3>
                             {ventaSeleccionada 
@@ -387,7 +418,7 @@ export function DashboardVentas() {
                                 ) : !ventaSeleccionada.detalles || ventaSeleccionada.detalles.length === 0 ? (
                                     <tr>
                                         <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#e74c3c' }}>
-                                            Esta venta no contiene artículos en el sistema.
+                                            Esta venta no contains artículos en el sistema.
                                         </td>
                                     </tr>
                                 ) : (

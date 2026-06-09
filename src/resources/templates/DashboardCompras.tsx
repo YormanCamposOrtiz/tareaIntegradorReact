@@ -96,6 +96,37 @@ export function DashboardCompras() {
     }
     };
 
+    // FUNCIÓN PARA DESCARGAR EL REPORTE EN PDF (CORREGIDA)
+    const descargarReportePdf = async (endpoint: string, nombreArchivo: string) => {
+        try {
+            const token = localStorage.getItem("token"); // Obtenemos tu Token JWT
+
+            const response = await api.get(endpoint, {
+                responseType: 'blob', // OBLIGATORIO para leer flujos binarios de PDF
+                headers: {
+                    'Authorization': `Bearer ${token}` // Evita el error 403 Forbidden
+                }
+            });
+
+            // Crear una URL del objeto binario del PDF
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', nombreArchivo); 
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpiar el DOM
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error al descargar el archivo PDF:", error);
+            alert("No se pudo generar el documento PDF. Comprueba tus accesos.");
+        }
+    };
+
     // Función para el botón "Buscar"
     const handleBuscarPorFechas = () => {
         if (!fechaDesde || !fechaHasta) {
@@ -319,6 +350,7 @@ const handleExportarExcel = async () => {
                         </button>
                     )}
                     <button className="btn-buscar" onClick={handleExportarExcel}>Exportar Excel</button>
+                    <button onClick={() => descargarReportePdf('/productos/exportar-pdf', 'Inventario.pdf')} className="btn-pdf">Exportar a PDF</button>
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 

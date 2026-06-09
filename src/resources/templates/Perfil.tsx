@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// 🔄 CAMBIO: Se agregó "Loader2" para la animación de carga
-import { User, MapPin, Package, Settings, LogOut, Shield, ArrowLeft, Save, Loader2 } from "lucide-react";
+// 🔄 CAMBIO: Agregados los íconos Eye y EyeOff para el control de visibilidad de contraseñas
+import { User, MapPin, Package, Settings, LogOut, ArrowLeft, Save, Loader2, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
 
 import { Header } from './fragments/Header';
@@ -34,6 +34,20 @@ export function Perfil() {
   const [configForm, setConfigForm] = useState({ nombre: "", telefono: "", password: "", confirmPassword: "" });
   const [mensajeConfig, setMensajeConfig] = useState("");
   const [errorConfig, setErrorConfig] = useState(false);
+  
+  // 🔄 CAMBIO: Estados para el manejo visual y de seguridad de la nueva contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipCoords, setTooltipCoords] = useState({ top: 0, left: 0 });
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  const [passwordCriteria, setPasswordCriteria] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    specialChar: false,
+  });
 
   const navigate = useNavigate();
 
@@ -46,7 +60,6 @@ export function Perfil() {
       return;
     }
     
-    // Capturamos el momento exacto en que inicia la carga
     const tiempoInicio = Date.now();
     
     axios.get(`http://localhost:8080/api/auth/buscar?correo=${userEmail}`)
@@ -67,7 +80,6 @@ export function Perfil() {
           });
         }
         
-        // 🔄 CAMBIO: Calcular cuánto tardó la petición para mantener el loader por un mínimo de 1.5 segundos
         const tiempoTranscurrido = Date.now() - tiempoInicio;
         const tiempoRestante = Math.max(250 - tiempoTranscurrido, 0);
 
@@ -77,7 +89,6 @@ export function Perfil() {
       })
       .catch((err) => {
         console.error("Error al conectar con PostgreSQL:", err);
-        // En caso de error también respetamos una pequeña espera antes de quitar el loading
         setTimeout(() => setLoading(false), 100);
       });
   }, [navigate]);
@@ -88,6 +99,44 @@ export function Perfil() {
     localStorage.removeItem("userId"); 
     navigate("/login");
   };
+
+  // 🔄 CAMBIO: Lógica de posicionamiento y validación en tiempo real del Tooltip
+  const handleFocus = () => {
+    if (passwordInputRef.current) {
+      const rect = passwordInputRef.current.getBoundingClientRect();
+      setTooltipCoords({
+        top: rect.top + window.scrollY + rect.height / 2,
+        left: rect.right + window.scrollX + 15
+      });
+    }
+    setShowTooltip(true);
+  };
+
+  const handlePasswordChange = (password: string) => {
+    setConfigForm({ ...configForm, password: password });
+
+    setPasswordCriteria({
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      specialChar: /[@$!%*?&._#\-+=¿¡]/.test(password),
+    });
+  };
+
+  // --- VALIDACIONES COMPLEMENTARIAS ---
+  const esContrasenaValida =
+    !configForm.password || // Es válida si está vacía (porque no desea cambiarla)
+    (passwordCriteria.length &&
+      passwordCriteria.uppercase &&
+      passwordCriteria.number &&
+      passwordCriteria.specialChar);
+
+  const contrasenasCoinciden = configForm.password === configForm.confirmPassword;
+
+  const formularioConfigCompleto =
+    configForm.nombre.trim() !== "" &&
+    esContrasenaValida &&
+    contrasenasCoinciden;
 
   // --- 🛠️ VALIDACIONES Y ENVÍO DE DIRECCIÓN ---
   const handleGuardarDireccion = (e: React.FormEvent) => {
@@ -131,7 +180,7 @@ export function Perfil() {
   // --- 🛠️ VALIDACIONES Y ENVÍO DE CONFIGURACIÓN ---
   const handleGuardarConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!usuario) return;
+    if (!usuario || !formularioConfigCompleto) return;
 
     const nombreClean = configForm.nombre.trim();
     const telefonoClean = configForm.telefono.trim();
@@ -152,25 +201,14 @@ export function Perfil() {
       }
     }
 
+    // Si escribió algo en el campo password, procesamos el cambio de clave
     if (configForm.password) {
-      if (configForm.password.length < 8) {
-        setErrorConfig(true);
-        setMensajeConfig("❌ La nueva contraseña debe tener al menos 8 caracteres.");
-        return;
-      }
-
-      if (configForm.password !== configForm.confirmPassword) {
-        setErrorConfig(true);
-        setMensajeConfig("❌ Las contraseñas no coinciden");
-        return;
-      }
-
       try {
         await axios.put(`http://localhost:8080/api/perfil/${usuario.id}/contrasena`, {
           nuevaContrasena: configForm.password
         });
       } catch (err) {
-        console.error("Error al encriptar/cambiar contraseña:", err);
+        console.error("Error al cambiar contraseña:", err);
         setErrorConfig(true);
         setMensajeConfig("❌ Error al actualizar la contraseña.");
         return;
@@ -184,8 +222,9 @@ export function Perfil() {
     .then((res) => {
       setUsuario(res.data);
       setErrorConfig(false);
-      setMensajeConfig("✅ ¡Cambios guardados con éxito en NeonTech!");
+      setMensajeConfig("✅ ¡Cambios guardados con éxito!");
       setConfigForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      setPasswordCriteria({ length: false, uppercase: false, number: false, specialChar: false });
       setTimeout(() => setMensajeConfig(""), 3000);
     })
     .catch((err) => {
@@ -195,28 +234,13 @@ export function Perfil() {
     });
   };
 
-  // 🔄 CAMBIO: Vista HTML mejorada para el estado de carga (Loading)
   if (loading) {
     return (
       <div className="loading-container" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        gap: '15px',
-        backgroundColor: '#f9fafb'
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: '15px', backgroundColor: '#f9fafb'
       }}>
-        <Loader2 size={48} className="spinner-icon" style={{
-          color: '#f37907',
-          animation: 'spin 1s linear infinite'
-        }} />
-        <p style={{
-          color: '#63564b',
-          fontSize: '1.1rem',
-          fontWeight: 500,
-          fontFamily: 'sans-serif'
-        }}>
+        <Loader2 size={48} className="spinner-icon" style={{ color: '#f37907', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: '#63564b', fontSize: '1.1rem', fontWeight: 500, fontFamily: 'sans-serif' }}>
           Cargando tu perfil...
         </p>
       </div>
@@ -281,7 +305,7 @@ export function Perfil() {
               </div>
             )}
 
-            {/* VISTA 2: DIRECCIÓN ÚNICA */}
+            {/* VISTA 2: DIRECCIÓN */}
             {view === "direcciones" && (
               <div className="subview-container">
                 <h2 className="subview-title">📍 Mi Dirección de Envío</h2>
@@ -329,7 +353,7 @@ export function Perfil() {
               </div>
             )}
 
-            {/* VISTA 3: CONFIGURACIÓN */}
+            {/* VISTA 3: CONFIGURACIÓN (CON COMPORTAMIENTO INTEGRADO) */}
             {view === "configuracion" && (
               <div className="subview-container">
                 <h2 className="subview-title">⚙️ Ajustes de Cuenta y Seguridad</h2>
@@ -367,25 +391,93 @@ export function Perfil() {
                   />
 
                   <h3 style={{ marginTop: '25px' }}>🔑 Cambiar Contraseña</h3>
-                  <label>Nueva Contraseña</label>
-                  <input 
-                    type="password" 
-                    placeholder="Mínimo 8 caracteres"
-                    value={configForm.password}
-                    onChange={e => setConfigForm({...configForm, password: e.target.value})}
-                    maxLength={32}
-                  />
+                  
+                  {/* INPUT NUEVA CONTRASEÑA CON INTERFAZ DE REGISTRO */}
+                  <label>Nueva Contraseña <span className="text-gray-400 font-normal text-xs">(Dejar en blanco para mantener actual)</span></label>
+                  <div className="input-group" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input 
+                      ref={passwordInputRef}
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="Mínimo 8 caracteres"
+                      value={configForm.password}
+                      onChange={e => handlePasswordChange(e.target.value)}
+                      onFocus={handleFocus}
+                      onBlur={() => setShowTooltip(false)}
+                      maxLength={32}
+                      className="w-full"
+                      style={{ paddingRight: '45px' }} // Evita que el texto se superponga con el icono
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-orange-500 transition-colors"
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        position: 'absolute', 
+                        right: '12px',
+                        top: '40%',                  // 👈 Mueve el botón al 50% del contenedor
+                        transform: 'translateY(-50%)', // 👈 Eje central exacto verticalmente
+                        display: 'flex',             // 👈 Asegura que el SVG interno se alinee
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
 
-                  <label>Confirmar Nueva Contraseña</label>
-                  <input 
-                    type="password" 
-                    placeholder="Repite tu nueva clave"
-                    value={configForm.confirmPassword}
-                    onChange={e => setConfigForm({...configForm, confirmPassword: e.target.value})}
-                    maxLength={32}
-                  />
+                  {/* INPUT CONFIRMAR CONTRASEÑA */}
+                  <label style={{ marginTop: '12px' }}>Confirmar Nueva Contraseña</label>
+                  <div className="input-group" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input 
+                      type={showConfirmPassword ? "text" : "password"} 
+                      placeholder="Repite tu nueva clave"
+                      value={configForm.confirmPassword}
+                      onChange={e => setConfigForm({...configForm, confirmPassword: e.target.value})}
+                      maxLength={32}
+                      className="w-full"
+                      style={{ paddingRight: '45px' }} // Evita que el texto se superponga con el icono
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="text-gray-400 hover:text-orange-500 transition-colors"
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        position: 'absolute', 
+                        right: '12px',
+                        top: '40%',                  // 👈 Mueve el botón al 50% del contenedor
+                        transform: 'translateY(-50%)', // 👈 Eje central exacto verticalmente
+                        display: 'flex',             // 👈 Asegura que el SVG interno se alinee
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                  {/* Alerta de contraseñas no coincidentes */}
+                  {configForm.password.length > 0 && !contrasenasCoinciden && (
+                    <p className="text-red-500 text-left text-[11px] mt-1 ml-1 font-medium">
+                      ✕ Las contraseñas no coinciden.
+                    </p>
+                  )}
 
-                  <button type="submit" className="btn-submit-subview save-btn">
+                  <button 
+                    type="submit" 
+                    disabled={!formularioConfigCompleto}
+                    className={`btn-submit-subview save-btn mt-4 transition-all duration-300 ${
+                      formularioConfigCompleto ? "" : "opacity-50 cursor-not-allowed"
+                    }`}
+                    style={{
+                      backgroundColor: formularioConfigCompleto ? '#f97316' : '#e5e7eb',
+                      color: formularioConfigCompleto ? '#ffffff' : '#9ca3af'
+                    }}
+                  >
                     <Save size={18} /> Guardar Configuración
                   </button>
                 </form>
@@ -404,6 +496,46 @@ export function Perfil() {
           <br />
         </div>
       </main>
+
+      {/* 🌟 TOOLTIP FLOTANTE DINÁMICO (INYECTADO AL FINAL DEL BODY) 🌟 */}
+      {showTooltip && configForm.password.length > 0 && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: `${tooltipCoords.top}px`,
+            left: `${tooltipCoords.left}px`,
+            transform: 'translateY(-50%)',
+            zIndex: 99999,
+            width: '290px',
+            backgroundColor: '#edf2f7',
+            padding: '16px',
+            borderRadius: '14px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05)',
+            border: '1px solid #e2e8f0',
+            textAlign: 'left',
+            pointerEvents: 'none'
+          }}
+        >
+          <p style={{ color: '#4a5568', fontWeight: '600', marginBottom: '8px', fontSize: '13px' }}>
+            La nueva contraseña debe cumplir:
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+            <p style={{ color: passwordCriteria.length ? '#16a34a' : '#dc2626', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{passwordCriteria.length ? "✓" : "✕"}</span> Mínimo 8 caracteres.
+            </p>
+            <p style={{ color: passwordCriteria.uppercase ? '#16a34a' : '#dc2626', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{passwordCriteria.uppercase ? "✓" : "✕"}</span> Al menos una mayúscula.
+            </p>
+            <p style={{ color: passwordCriteria.number ? '#16a34a' : '#dc2626', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{passwordCriteria.number ? "✓" : "✕"}</span> Al menos un número.
+            </p>
+            <p style={{ color: passwordCriteria.specialChar ? '#16a34a' : '#dc2626', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{passwordCriteria.specialChar ? "✓" : "✕"}</span> Al menos un signo (@$!%*?&.).
+            </p>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
