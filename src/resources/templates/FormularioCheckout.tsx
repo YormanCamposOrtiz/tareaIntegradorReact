@@ -117,6 +117,16 @@ export function FormularioCheckout({
             </div>
           </div>
         )}
+        {/* Campos condicionales si elige Domicilio */}
+        {metodoEntrega === 'tienda' && (
+            <div className="checkout-card-title" style={{ marginTop: '20px', textAlign: 'center' }}>
+              <label>Puede Recogerlo en la tienda</label><br />
+              <label>Dirección exacta: Av. Los Incas 777 - Comas</label>   
+            </div>
+            
+            
+          
+        )}
       </div>
 
       {/* 2. Método de Pago */}
