@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { MapPin, Store, CreditCard, Smartphone } from "lucide-react";
 import "../static/FormularioCheckout.css";
 
@@ -24,6 +25,29 @@ export function FormularioCheckout({
   setDireccion,
   onVolver
 }: FormularioCheckoutProps) {
+
+useEffect(() => {
+    // 🔍 CAMBIO AQUÍ: Usamos "userId" que es como lo guarda tu Login
+    const idUsuario = localStorage.getItem("userId"); 
+
+    if (idUsuario && metodoEntrega === 'domicilio') {
+      fetch(`http://localhost:8080/api/perfil/${idUsuario}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Error al obtener el perfil");
+          return res.json();
+        })
+        .then((usuario) => {
+          if (usuario.direccion) {
+            setDireccion(usuario.direccion);
+          }
+          if (usuario.distrito) {
+            setDistrito(usuario.distrito.toLowerCase());
+          }
+        })
+        .catch((err) => console.error("Error cargando dirección automática:", err));
+    }
+  }, [metodoEntrega, setDireccion, setDistrito]);
+
   return (
     <div className="checkout-forms-wrapper">
       
