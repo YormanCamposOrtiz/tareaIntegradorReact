@@ -126,3 +126,128 @@ button.btn-cerrar:hover,
     border-color: #b91c1c !important;
     box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
 }
+/* ==========================================
+   TABLET
+========================================== */
+@media (max-width: 992px){
+
+  .ventas-content{
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .ventas-sidebar{
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  .ventas-main{
+    width: 100%;
+  }
+
+  .table-wrapper{
+    overflow-x: auto;
+  }
+
+  table{
+    min-width: 800px;
+  }
+
+}
+
+/* ==========================================
+   CELULAR
+========================================== */
+@media (max-width: 768px){
+
+  .ventas-container{
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .ventas-content{
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .ventas-sidebar{
+    width: 100%;
+    padding: 15px;
+    border-radius: 16px;
+  }
+
+  .ventas-sidebar button{
+    width: 100%;
+  }
+
+  .filter-group input{
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .table-wrapper{
+    padding: 10px;
+    border-radius: 16px;
+    overflow-x: auto;
+  }
+
+  table{
+    min-width: 700px;
+  }
+
+  thead th{
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  tbody td{
+    padding: 10px;
+    font-size: 13px;
+  }
+
+}
+
+/* ==========================================
+   CELULARES PEQUEÑOS
+========================================== */
+@media (max-width: 480px){
+
+  .ventas-content{
+    padding: 8px;
+  }
+
+  .ventas-sidebar{
+    padding: 12px;
+  }
+
+  .ventas-sidebar button{
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .filter-group input{
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .table-wrapper{
+    padding: 8px;
+  }
+
+  thead th{
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  tbody td{
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .btn-cerrar{
+    width: 100%;
+  }
+
+}
