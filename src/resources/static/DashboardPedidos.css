@@ -2,7 +2,7 @@
 .pedidos-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 .pedidos-content {
@@ -72,3 +72,107 @@
 
 .btn-nuevo { background-color: #ff7300; color: white; }
 .btn-cerrar { background-color: #6c757d; color: white; }
+/* =========================
+   TABLET
+========================= */
+@media (max-width: 1024px) {
+
+    .pedidos-content {
+        flex-direction: column;
+    }
+
+    .pedidos-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .pedidos-main {
+        width: 100%;
+    }
+}
+
+/* =========================
+   MOVIL
+========================= */
+@media (max-width: 768px) {
+
+    .pedidos-container {
+        height: auto;
+    }
+
+    .pedidos-content {
+        flex-direction: column;
+    }
+
+    .pedidos-sidebar {
+        width: 100%;
+        padding: 15px;
+        gap: 12px;
+        box-sizing: border-box;
+    }
+
+    .pedidos-sidebar button {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .pedidos-main {
+        padding: 12px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .table-wrapper table {
+        min-width: 800px;
+    }
+
+    .table-wrapper th,
+    .table-wrapper td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .badge-status {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+}
+
+/* =========================
+   CELULARES PEQUEÑOS
+========================= */
+@media (max-width: 480px) {
+
+    .pedidos-sidebar {
+        padding: 10px;
+    }
+
+    .pedidos-sidebar button {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .pedidos-main {
+        padding: 8px;
+    }
+
+    .table-wrapper table {
+        min-width: 700px;
+    }
+
+    .table-wrapper th,
+    .table-wrapper td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .badge-status {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}

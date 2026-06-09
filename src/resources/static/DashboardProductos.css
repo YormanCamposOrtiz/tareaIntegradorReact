@@ -471,7 +471,7 @@ tbody tr:last-child td {
 @media (max-width: 600px) {
 
   .productos-container {
-    padding: 16px;
+    padding: 0px;
   }
 
   .btn-nuevo-header {
@@ -485,5 +485,119 @@ tbody tr:last-child td {
 
   .modal-form {
     padding: 22px;
+  }
+}
+/* ==========================================
+   RESPONSIVE MEJORADO TABLET
+========================================== */
+@media (max-width: 900px) {
+
+  .productos-full-content{
+    padding: 15px;
+  }
+
+  .table-toolbar{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-container{
+    width: 100%;
+  }
+
+  .input-search{
+    width: 100%;
+  }
+
+  .btn-nuevo-header,
+  .btn-confirm{
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-row{
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrapper{
+    overflow-x: auto;
+  }
+
+  table{
+    min-width: 800px;
+  }
+
+  .modal-box{
+    width: 95%;
+    max-width: 95%;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE CELULAR
+========================================== */
+@media (max-width: 480px) {
+
+  .productos-full-content{
+    padding: 10px;
+  }
+
+  .table-toolbar{
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-overlay{
+    padding: 10px;
+  }
+
+  .modal-box{
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+  }
+
+  .modal-header{
+    padding: 15px;
+  }
+
+  .modal-header h3{
+    font-size: 18px;
+  }
+
+  .modal-form{
+    padding: 15px;
+  }
+
+  .form-group input,
+  .form-group select{
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .modal-actions{
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-confirm{
+    width: 100%;
+  }
+
+  .actions-cell{
+    gap: 6px;
+  }
+
+  .btn-icon-edit,
+  .btn-icon-delete{
+    width: 34px;
+    height: 34px;
+  }
+
+  .img-tabla-mini{
+    width: 40px;
+    height: 40px;
   }
 }

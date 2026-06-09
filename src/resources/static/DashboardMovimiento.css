@@ -573,3 +573,156 @@ thead th:last-child { border-top-right-radius: 8px; }
 .table-wrapper::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
+/* ===================================
+   TABLET
+=================================== */
+@media (max-width: 1024px) {
+
+    .ventas-content,
+    .compras-content {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .ventas-sidebar,
+    .compras-sidebar {
+        width: 100%;
+    }
+
+    .ventas-main,
+    .compras-main {
+        width: 100%;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table,
+    .modal-tabla {
+        min-width: 900px;
+    }
+
+    .modal-content {
+        width: 95%;
+        height: 90vh;
+    }
+}
+
+
+/* ===================================
+   MOVIL
+=================================== */
+@media (max-width: 768px) {
+
+    .ventas-container,
+    .compras-container {
+        height: auto;
+        overflow: visible;
+    }
+
+    .ventas-content,
+    .compras-content {
+        flex-direction: column;
+        gap: 16px;
+        padding: 12px;
+    }
+
+    .ventas-sidebar,
+    .compras-sidebar {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .ventas-sidebar button,
+    .compras-sidebar button {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .table-wrapper {
+        padding: 12px;
+        overflow-x: auto;
+    }
+
+    table,
+    .modal-tabla {
+        min-width: 800px;
+    }
+
+    thead th,
+    tbody td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .modal-content {
+        width: 95%;
+        height: 95vh;
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .modal-acciones {
+        flex-direction: column;
+    }
+
+    .btn-modal-cancelar,
+    .btn-modal-registrar {
+        width: 100%;
+    }
+
+    .total-row {
+        font-size: 1rem;
+    }
+}
+
+
+/* ===================================
+   CELULARES PEQUEÑOS
+=================================== */
+@media (max-width: 480px) {
+
+    .ventas-content,
+    .compras-content {
+        padding: 8px;
+    }
+
+    .ventas-sidebar,
+    .compras-sidebar {
+        padding: 12px;
+    }
+
+    .filter-group label {
+        font-size: 12px;
+    }
+
+    .filter-group input {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .table-wrapper {
+        padding: 8px;
+    }
+
+    table,
+    .modal-tabla {
+        min-width: 700px;
+    }
+
+    thead th,
+    tbody td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-content {
+        padding: 12px;
+    }
+}
