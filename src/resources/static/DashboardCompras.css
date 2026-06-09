@@ -104,3 +104,124 @@ tbody td {
     border: 1px solid #ddd;
     background: #f1f5f9;
 }
+/* =========================
+   RESPONSIVE TABLET
+========================= */
+@media (max-width: 1024px) {
+
+    .compras-content {
+        flex-direction: column;
+    }
+
+    .compras-sidebar {
+        width: 100%;
+        border-radius: 20px;
+        padding: 20px;
+    }
+
+    .compras-main {
+        width: 100%;
+    }
+}
+
+/* =========================
+   RESPONSIVE MÓVIL
+========================= */
+@media (max-width: 768px) {
+
+    .compras-container {
+        height: auto;
+        overflow: auto;
+    }
+
+    .compras-content {
+        flex-direction: column;
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .compras-sidebar {
+        width: 100%;
+        padding: 15px;
+        border-radius: 20px;
+    }
+
+    .compras-sidebar button {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .compras-main {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 20px;
+        padding: 12px;
+    }
+
+    table {
+        min-width: 700px;
+    }
+
+    thead th {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    tbody td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .filter-group input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* =========================
+   RESPONSIVE CELULARES PEQUEÑOS
+========================= */
+@media (max-width: 480px) {
+
+    .compras-content {
+        padding: 8px;
+    }
+
+    .compras-sidebar {
+        padding: 12px;
+    }
+
+    .compras-sidebar button {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .table-wrapper {
+        padding: 8px;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    thead th {
+        font-size: 12px;
+        padding: 10px;
+    }
+
+    tbody td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .filter-group input {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
