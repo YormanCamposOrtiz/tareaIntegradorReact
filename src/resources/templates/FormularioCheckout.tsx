@@ -61,10 +61,49 @@ export function FormularioCheckout({
               <label>Distrito *</label>
               <select value={distrito} onChange={(e) => setDistrito(e.target.value)}>
                 <option value="">Selecciona tu distrito</option>
-                <option value="san_borja">San Borja</option>
-                <option value="surco">Santiago de Surco</option>
+                <option value="ancon">Ancón</option>
+                <option value="ate">Ate</option>
+                <option value="barranco">Barranco</option>
+                <option value="brena">Breña</option>
+                <option value="carabayllo">Carabayllo</option>
+                <option value="chaclacayo">Chaclacayo</option>
+                <option value="chorrillos">Chorrillos</option>
+                <option value="cieneguilla">Cieneguilla</option>
+                <option value="comas">Comas</option>
+                <option value="el_agustino">El Agustino</option>
+                <option value="independencia">Independencia</option>
+                <option value="jesus_maria">Jesús María</option>
+                <option value="la_molina">La Molina</option>
+                <option value="la_victoria">La Victoria</option>
+                <option value="lima">Lima (Cercado)</option>
+                <option value="lince">Lince</option>
+                <option value="los_olivos">Los Olivos</option>
+                <option value="lurigancho_chosica">Lurigancho-Chosica</option>
+                <option value="lurin">Lurín</option>
+                <option value="magdalena_del_mar">Magdalena del Mar</option>
                 <option value="miraflores">Miraflores</option>
-                <option value="lima">Lima Centro</option>
+                <option value="pachacamac">Pachacámac</option>
+                <option value="pucusana">Pucusana</option>
+                <option value="pueblo_libre">Pueblo Libre</option>
+                <option value="puente_piedra">Puente Piedra</option>
+                <option value="punta_hermosa">Punta Hermosa</option>
+                <option value="punta_negra">Punta Negra</option>
+                <option value="rimac">Rímac</option>
+                <option value="san_bartolo">San Bartolo</option>
+                <option value="san_borja">San Borja</option>
+                <option value="san_isidro">San Isidro</option>
+                <option value="san_juan_de_lurigancho">San Juan de Lurigancho</option>
+                <option value="san_juan_de_miraflores">San Juan de Miraflores</option>
+                <option value="san_luis">San Luis</option>
+                <option value="san_martin_de_porres">San Martín de Porres</option>
+                <option value="san_miguel">San Miguel</option>
+                <option value="santa_anita">Santa Anita</option>
+                <option value="santa_maria_del_mar">Santa María del Mar</option>
+                <option value="santa_rosa">Santa Rosa</option>
+                <option value="santiago_de_surco">Santiago de Surco</option>
+                <option value="surquillo">Surquillo</option>
+                <option value="villa_el_salvador">Villa El Salvador</option>
+                <option value="villa_maria_del_triunfo">Villa María del Triunfo</option>
               </select>
             </div>
             <div className="form-group">

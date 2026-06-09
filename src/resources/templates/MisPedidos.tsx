@@ -52,7 +52,6 @@ export function MisPedidos() {
 
     const fetchPedidos = async (desde?: string, hasta?: string) => {
         try {
-
             const usuarioId = localStorage.getItem("userId");
 
             if (!usuarioId) {
@@ -60,10 +59,13 @@ export function MisPedidos() {
                 return;
             }
 
-            const response = await api.get(
-                `/pedidos/usuario/${usuarioId}`
-            );
+            // Configuración de Query Params dinámicos
+            let url = `/pedidos/usuario/${usuarioId}`;
+            if (desde && hasta) {
+                url += `?inicio=${desde}&fin=${hasta}`;
+            }
 
+            const response = await api.get(url);
             setPedidos(response.data);
             setPedidoSeleccionado(null);
 
@@ -123,14 +125,6 @@ export function MisPedidos() {
             <div className="ventas-content">
                 {/* SIDEBAR CON LOS MISMOS BOTONES Y DISEÑO DE VENTAS */}
                 <aside className="ventas-sidebar">
-                    <button 
-                        className="btn-actualizar" 
-                        style={{ backgroundColor: '#2980b9', color: 'white' }} 
-                        onClick={() => fetchPedidos(fechaDesde, fechaHasta)}
-                    >
-                        🔄 Actualizar mi Lista
-                    </button>
-
                     <button
                         className="btn-anular"
                         onClick={cancelarPedido}

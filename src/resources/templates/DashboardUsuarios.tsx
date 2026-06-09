@@ -102,7 +102,7 @@ export function DashboardUsuarios() {
       <div className="side-panel">
           <h4>Acciones</h4>
           <button className="btn-add-admin"
-            onClick={() => navigate("/admin/registro")}>
+            onClick={() => navigate("/DashboardRegistro")}>
             <UserPlus size={18} />Crear Admin</button>
         </div><br></br>
       <div className="crud-card">
