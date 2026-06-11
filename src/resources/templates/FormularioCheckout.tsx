@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import React, { useState } from 'react';
 import { MapPin, Store, CreditCard, Smartphone } from "lucide-react";
 import "../static/FormularioCheckout.css";
 
@@ -24,6 +26,50 @@ export function FormularioCheckout({
   setDireccion,
   onVolver
 }: FormularioCheckoutProps) {
+
+  // ✅ SOLUCIÓN: Los estados de la tarjeta se declaran en la raíz del componente
+  const [numeroTarjeta, setNumeroTarjeta] = useState('');
+  const [fechaExpiracion, setFechaExpiracion] = useState('');
+  const [cvv, setCvv] = useState('');
+
+  // ✅ SOLUCIÓN: Las funciones de control también van en la raíz del componente
+  const handleNumeroTarjetaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valorLimpio = e.target.value.replace(/[^\d]/g, '');
+    setNumeroTarjeta(valorLimpio.slice(0, 16));
+  };
+
+  const handleFechaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valorLimpio = e.target.value.replace(/[^\d]/g, '');
+    setFechaExpiracion(valorLimpio.slice(0, 4)); 
+  };
+
+  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valorLimpio = e.target.value.replace(/[^\d]/g, '');
+    setCvv(valorLimpio.slice(0, 4));
+  };
+
+  useEffect(() => {
+    // 🔍 El useEffect ahora solo hace lo que le corresponde: cargar los datos del usuario
+    const idUsuario = localStorage.getItem("userId"); 
+
+    if (idUsuario && metodoEntrega === 'domicilio') {
+      fetch(`http://localhost:8080/api/perfil/${idUsuario}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("Error al obtener el perfil");
+          return res.json();
+        })
+        .then((usuario) => {
+          if (usuario.direccion) {
+            setDireccion(usuario.direccion);
+          }
+          if (usuario.distrito) {
+            setDistrito(usuario.distrito.toLowerCase());
+          }
+        })
+        .catch((err) => console.error("Error cargando dirección automática:", err));
+    }
+  }, [metodoEntrega, setDireccion, setDistrito]);
+
   return (
     <div className="checkout-forms-wrapper">
       
@@ -117,12 +163,13 @@ export function FormularioCheckout({
             </div>
           </div>
         )}
-        {/* Campos condicionales si elige Domicilio */}
+
+        {/* Campos condicionales si elige Tienda */}
         {metodoEntrega === 'tienda' && (
-            <div className="checkout-card-title" style={{ marginTop: '20px', textAlign: 'center' }}>
-              <label>Puede Recogerlo en la tienda</label><br />
-              <label>Dirección exacta: Av. Los Incas 777 - Comas</label>   
-            </div>
+          <div className="checkout-pickup-container">
+            <span className="checkout-pickup-title">Puede recogerlo en la tienda</span>
+            <span className="checkout-pickup-address">Dirección exacta: Av. Los Incas 777 - Comas</span> 
+          </div>
         )}
       </div>
 
@@ -152,6 +199,49 @@ export function FormularioCheckout({
             </div>
           </div>
         </div>
+
+        {/* Campos del formulario de tarjeta (Solo aparecen si elige tarjeta) */}
+        {metodoPago === 'tarjeta' && (
+          <div className="card-form-container">
+            <div className="form-group">
+              <label className="form-label">Número de tarjeta</label>
+              <input 
+                type="text" 
+                inputMode="numeric"
+                placeholder="0000 0000 0000 0000"
+                value={numeroTarjeta}
+                onChange={handleNumeroTarjetaChange}
+                className="form-input"
+              />
+            </div>
+            
+            <div className="form-row-double">
+              <div className="form-group">
+                <label className="form-label">Vencimiento (MM/AA)</label>
+                <input 
+                  type="text" 
+                  inputMode="numeric"
+                  placeholder="MM/AA"
+                  value={fechaExpiracion}
+                  onChange={handleFechaChange}
+                  className="form-input"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">CVV</label>
+                <input 
+                  type="password" 
+                  inputMode="numeric"
+                  placeholder="123"
+                  value={cvv}
+                  onChange={handleCvvChange}
+                  className="form-input"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Enlace para regresar */}

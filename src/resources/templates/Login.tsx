@@ -14,58 +14,51 @@ export function Login() {
   const [credentials, setCredentials] = useState({ correo: "", contrasena: "" });
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); 
 
     try {
       const { correo, contrasena } = credentials; 
       
-      // Petición al backend
+      // 1. Una sola petición al backend (Neon Tech a través de Spring Boot)
       const response = await api.post('/auth/login', { correo, contrasena });
       const user = response.data;
 
       console.log("CONSOLA DEPURACIÓN - Esto es lo que responde mi backend:", user);
 
-      // ... dentro de tu función handleSubmit en Login.tsx
+      // 2. Evaluamos la respuesta del objeto 'user'
       if (user.success) {
-            // 1. Guardamos lo que ya tenemos
-        // Petición al backend
-              const response = await api.post('/auth/login', { correo, contrasena });
-              const user = response.data; // Ahora contiene { success: true, id: 2, ... }
-
-              if (user.success) {
-                // 1. Guardar datos en el localStorage
-                localStorage.setItem("userEmail", correo);
-                localStorage.setItem("userRole", user.rol);
-                
-                // 💡 AQUÍ ESTÁ EL TRUCO: Guardamos el ID que ahora envía tu LoginController modificado
-                if (user.id) {
-                  localStorage.setItem("userId", user.id.toString());
-                  console.log("✅ ID de usuario guardado con éxito en localStorage:", user.id);
-                } else {
-                  console.error("❌ Error: El backend sigue sin enviar el campo 'id'. Revisa si guardaste y reiniciaste Spring Boot.");
-                }
-
-                // 2. Redirección de roles
-                if (user.rol === 'ADMINISTRADOR') {
-                  navigate('/dashboardHome');
-                } else {
-                  navigate('/');
-                }
-              }
-          }
-        } catch (err: any) {
-          if (err.response) {
-            const status = err.response.status;
-            if (status === 403) alert("Cuenta bloqueada temporalmente.");
-            else if (status === 401) alert("Usuario o contraseña incorrectos.");
-            else alert("Error en el servidor.");
-          } else {
-            alert("No se pudo conectar con el servidor.");
-          }
+        // Guardar datos en el localStorage del navegador
+        localStorage.setItem("userEmail", correo);
+        localStorage.setItem("userRole", user.rol);
+        
+        // Guardamos el ID del usuario para usarlo en el Checkout
+        if (user.id) {
+          localStorage.setItem("userId", user.id.toString());
+          console.log("✅ ID de usuario guardado con éxito en localStorage:", user.id);
+        } else {
+          console.error("❌ Error: El backend sigue sin enviar el campo 'id'.");
         }
-      };
+
+        // 3. Redirección de roles
+        if (user.rol === 'ADMINISTRADOR') {
+          navigate('/dashboardHome');
+        } else {
+          navigate('/');
+        }
+      }
+    } catch (err: any) {
+      if (err.response) {
+        const status = err.response.status;
+        if (status === 403) alert("Cuenta bloqueada temporalmente.");
+        else if (status === 401) alert("Usuario o contraseña incorrectos.");
+        else alert("Error en el servidor.");
+      } else {
+        alert("No se pudo conectar con el servidor.");
+      }
+    }
+  };
 
 return (
     <div className="login-page-wrapper">

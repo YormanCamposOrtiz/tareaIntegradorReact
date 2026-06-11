@@ -27,6 +27,9 @@ export function Carrito() {
   // Estado para controlar pantallas de carga o deshabilitar botones al procesar
   const [cargando, setCargando] = useState(false);
 
+
+  const [mostrarModalLogin, setMostrarModalLogin] = useState(false);
+
   // Estados del Formulario
   const [metodoEntrega, setMetodoEntrega] = useState<'domicilio' | 'tienda'>('domicilio');
   const [metodoPago, setMetodoPago] = useState<'yape_plin' | 'tarjeta'>('yape_plin');
@@ -65,7 +68,18 @@ export function Carrito() {
     const nuevoCarrito = items.filter(item => item.id !== id);
     guardarCarrito(nuevoCarrito);
   };
-
+// === AGREGA ESTA FUNCIÓN AQUÍ ===
+  const manejarContinuarCompra = () => {
+    const loggedInUserId = localStorage.getItem("userId");
+    
+    if (!loggedInUserId) {
+      // Si no hay sesión, activa la ventana flotante de advertencia
+      setMostrarModalLogin(true);
+    } else {
+      // Si el usuario está autenticado, avanza normalmente al formulario
+      setPaso('checkout');
+    }
+  };
   // Cálculos
   const subtotal = items.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
   const costoEnvio = metodoEntrega === 'domicilio' && items.length > 0 ? 7.90 : 0;
@@ -247,7 +261,7 @@ export function Carrito() {
                 {paso === 'carrito' ? (
                   <button 
                     className="btn-payment-now" 
-                    onClick={() => setPaso('checkout')}
+                    onClick={manejarContinuarCompra}
                     disabled={items.length === 0}
                   >
                     CONTINUAR COMPRA
@@ -275,6 +289,26 @@ export function Carrito() {
       </main>
 
       <Footer/>
+
+      // === AGREGA ESTE BLOQUE DE AQUÍ HASTA EL FINAL ===
+      {mostrarModalLogin && (
+        <div className="modal-login-overlay">
+          <div className="modal-login-card">
+            <div className="modal-login-icon">⚠️</div>
+            <h2>Inicio de Sesión Requerido</h2>
+            <p>Para poder procesar tu pedido en <strong>MediExpress</strong> y gestionar el envío correctamente, necesitas contar con una sesión activa.</p>
+            <div className="modal-login-actions">
+              <button className="btn-modal-close" onClick={() => setMostrarModalLogin(false)}>
+                Regresar al Carrito
+              </button>
+              <Link to="/login" className="btn-modal-go-login">
+                Iniciar Sesión
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }

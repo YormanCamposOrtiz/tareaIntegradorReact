@@ -98,6 +98,33 @@
   color: #4b5563;
 }
 
+/* Contenedor principal del mensaje de recojo */
+.checkout-pickup-container {
+  margin-top: 20px;
+  text-align: center;
+  padding: 15px;
+  background-color: #f9f9f9; /* Un fondo sutil para enmarcar la info (opcional) */
+  border-radius: 8px;
+  border: 1px dashed #ccc; /* Línea discontinua estilo "cupón/ticket" */
+}
+
+/* Estilo para el título de recojo */
+.checkout-pickup-title {
+  display: block; /* Hace que se comporte como un párrafo y salte de línea */
+  font-size: 16px;
+  font-weight: 600; /* Texto semi-negrita */
+  color: #333333;
+  margin-bottom: 6px; /* Espacio antes de la dirección */
+}
+
+/* Estilo para la dirección exacta */
+.checkout-pickup-address {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  color: #666666; /* Un tono un poco más suave para crear jerarquía visual */
+}
+
 .form-group input, 
 .form-group select {
   padding: 12px 16px;
@@ -134,6 +161,59 @@
 .btn-back-to-cart:hover {
   color: #111827;
   text-decoration: underline;
+}
+
+/* Contenedor del formulario de tarjeta */
+.card-form-container {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.3s ease-in-out; /* Efecto suave al aparecer */
+}
+
+/* Filas y grupos de inputs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row-double {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* Estilos de las etiquetas e inputs */
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.form-input {
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #3182ce; /* Cambia al color de tu checkout activo */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 640px) {
