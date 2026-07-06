@@ -61,68 +61,54 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   filter: brightness(1.05);
 }
-/* =========================
-   TABLET
-========================= */
-@media (max-width: 768px) {
 
+
+/* ===================================================
+   VISTA RESPONSIVA (MÓVIL Y TABLETS)
+=================================================== */
+
+@media (max-width: 768px) {
   .admin-header {
-    padding: 15px 20px;
-    flex-wrap: wrap;
-    gap: 15px;
+    padding: 12px 20px; /* Reducimos un poco el alto general */
+    flex-direction: row !important; /* Mantenemos todo en una sola línea horizontal */
+    justify-content: space-between;
+    align-items: center;
   }
 
   .brand-title {
     font-size: 1.2rem;
   }
 
-  .admin-clock {
-    font-size: 0.8rem;
-    padding: 4px 10px;
-  }
-
-  .btn-logout {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-}
-
-/* =========================
-   CELULAR
-========================= */
-@media (max-width: 480px) {
-
-  .admin-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    padding: 15px;
-  }
-
-  .header-brand {
-    justify-content: center;
-    flex-wrap: wrap;
-    text-align: center;
-    gap: 10px;
-  }
-
-  .brand-title {
-    font-size: 1.1rem;
-  }
-
-  .admin-clock {
-    margin-left: 0;
-    font-size: 0.75rem;
+  /* Ocultamos por completo el reloj en dispositivos móviles */
+  .hide-on-mobile {
+    display: none !important;
   }
 
   .header-actions {
-    width: 100%;
+    width: auto; /* Evita que ocupe todo el ancho */
   }
 
   .btn-logout {
-    width: 100%;
+    padding: 10px; /* Lo volvemos un botón más cuadrado/circular */
+    border-radius: 50%; /* Si quieres que sea redondo, o usa 10px para mantenerlo semi-cuadrado */
     justify-content: center;
-    font-size: 0.9rem;
-    padding: 12px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* Ocultamos únicamente el texto "Salir", dejando solo el icono LogOut */
+  .logout-text {
+    display: none !important;
+  }
+}
+
+/* Ajustes finos para celulares muy pequeños */
+@media (max-width: 480px) {
+  .admin-header {
+    padding: 10px 15px;
+  }
+  
+  .brand-title {
+    font-size: 1.1rem;
   }
 }

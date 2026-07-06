@@ -348,93 +348,148 @@ export function DashboardVentas() {
                     <button className="btn-cerrar" onClick={() => navigate('/DashboardHome')}>Cerrar</button>
                 </aside>
 
-                <main className="ventas-main">
-                    <div className="table-wrapper">
-                        <h3>Historial de Ventas</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID_Venta</th>
-                                    <th>Usuario</th>
-                                    <th>Fecha y Hora</th>
-                                    <th>Total Cobrado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {ventas.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} style={{ textAlign: 'center', padding: '10px' }}>No hay ventas registradas.</td>
-                                    </tr>
-                                ) : (
-                                    ventas.map(v => {
-                                        const isSelected = ventaSeleccionada?.id === v.id;
-                                        return (
-                                            <tr 
-                                                key={v.id} 
-                                                onClick={() => setVentaSeleccionada(v)} 
-                                                style={{ 
-                                                    cursor: 'pointer', 
-                                                    backgroundColor: isSelected ? '#ebf5fb' : '',
-                                                    fontWeight: isSelected ? 'bold' : 'normal'
-                                                }}
-                                                className={isSelected ? "fila-seleccionada" : ""}
-                                            >
-                                                <td>{String(v.id).padStart(3, '0')}</td>
-                                                <td>{v.usuario?.nombre || v.usuario?.username || 'Empleado Activo'}</td>
-                                                <td>{v.fecha ? new Date(v.fecha).toLocaleString() : 'Fecha no registrada'}</td>
-                                                <td style={{ fontWeight: 'bold', color: '#27ae60' }}>
-                                                    S/. {(v.total || 0).toFixed(2)}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
+<main className="ventas-main">
+    {/* ================= SECCIÓN: HISTORIAL DE VENTAS ================= */}
+    <div className="table-wrapper">
+        <h3>Historial de Ventas</h3>
+        
+        {/* Vista de Tabla (Se ocultará en móvil) */}
+        <table className="tabla-escritorio">
+            <thead>
+                <tr>
+                    <th>ID_Venta</th>
+                    <th>Usuario</th>
+                    <th>Fecha y Hora</th>
+                    <th>Total Cobrado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {ventas.length === 0 ? (
+                    <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '10px' }}>No hay ventas registradas.</td>
+                    </tr>
+                ) : (
+                    ventas.map(v => {
+                        const isSelected = ventaSeleccionada?.id === v.id;
+                        return (
+                            <tr 
+                                key={v.id} 
+                                onClick={() => setVentaSeleccionada(v)} 
+                                style={{ 
+                                    cursor: 'pointer', 
+                                    backgroundColor: isSelected ? '#ebf5fb' : '',
+                                    fontWeight: isSelected ? 'bold' : 'normal'
+                                }}
+                                className={isSelected ? "fila-seleccionada" : ""}
+                            >
+                                <td>{String(v.id).padStart(3, '0')}</td>
+                                <td>{v.usuario?.nombre || v.usuario?.username || 'Empleado Activo'}</td>
+                                <td>{v.fecha ? new Date(v.fecha).toLocaleString() : 'Fecha no registrada'}</td>
+                                <td style={{ fontWeight: 'bold', color: '#27ae60' }}>
+                                    S/. {(v.total || 0).toFixed(2)}
+                                </td>
+                            </tr>
+                        );
+                    })
+                )}
+            </tbody>
+        </table>
+
+        {/* Vista de Tarjetas (Solo se mostrará en móvil) */}
+        <div className="tarjetas-movil">
+            {ventas.length === 0 ? (
+                <p className="no-data">No hay ventas registradas.</p>
+            ) : (
+                ventas.map(v => {
+                    const isSelected = ventaSeleccionada?.id === v.id;
+                    return (
+                        <div 
+                            key={v.id}
+                            className={`tarjeta-venta ${isSelected ? "tarjeta-seleccionada" : ""}`}
+                            onClick={() => setVentaSeleccionada(v)}
+                        >
+                            <div className="tarjeta-header">
+                                <span className="tarjeta-id">ID: #{String(v.id).padStart(3, '0')}</span>
+                                <span className="tarjeta-total">S/. {(v.total || 0).toFixed(2)}</span>
+                            </div>
+                            <div className="tarjeta-body">
+                                <p><strong>Usuario:</strong> {v.usuario?.nombre || v.usuario?.username || 'Empleado Activo'}</p>
+                                <p><strong>Fecha:</strong> {v.fecha ? new Date(v.fecha).toLocaleString() : 'Fecha no registrada'}</p>
+                            </div>
+                        </div>
+                    );
+                })
+            )}
+        </div>
+    </div>
+    
+    {/* ================= SECCIÓN: DETALLES DE LA VENTA ================= */}
+    <div className="table-wrapper">
+        <h3>
+            {ventaSeleccionada 
+                ? `Artículos de la Venta #${String(ventaSeleccionada.id).padStart(3, '0')}` 
+                : "Seleccione una venta para ver sus artículos"}
+        </h3>
+        
+        {/* Vista de Tabla (Se ocultará en móvil) */}
+        <table className="tabla-escritorio">
+            <thead>
+                <tr>
+                    <th>Nombre del Producto</th>
+                    <th>Cantidad Vendida</th>
+                    <th>Precio Unitario</th>
+                    <th>Sub Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {!ventaSeleccionada ? (
+                    <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#7f8c8d' }}>
+                            Ninguna venta seleccionada en la tabla superior.
+                        </td>
+                    </tr>
+                ) : !ventaSeleccionada.detalles || ventaSeleccionada.detalles.length === 0 ? (
+                    <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#e74c3c' }}>
+                            Esta venta no contiene artículos en el sistema.
+                        </td>
+                    </tr>
+                ) : (
+                    ventaSeleccionada.detalles.map((d, index) => (
+                        <tr key={d.id || index}>
+                            <td>{d.producto?.nombre || `Producto ID: ${d.producto?.id || 'Desconocido'}`}</td>
+                            <td>{d.cantidad} u.</td>
+                            <td>S/. {(d.precioUnitario || 0).toFixed(2)}</td>
+                            <td style={{ fontWeight: 'bold' }}>S/. {(d.subtotal || 0).toFixed(2)}</td>
+                        </tr>
+                    ))
+                )}
+            </tbody>
+        </table>
+
+        {/* Vista de Tarjetas (Solo se mostrará en móvil) */}
+        <div className="tarjetas-movil">
+            {!ventaSeleccionada ? (
+                <p className="no-data-select">Ninguna venta seleccionada en la sección superior.</p>
+            ) : !ventaSeleccionada.detalles || ventaSeleccionada.detalles.length === 0 ? (
+                <p className="no-data-error">Esta venta no contiene artículos en el sistema.</p>
+            ) : (
+                ventaSeleccionada.detalles.map((d, index) => (
+                    <div key={d.id || index} className="tarjeta-articulo">
+                        <div className="tarjeta-header-articulo">
+                            <strong>{d.producto?.nombre || 'Producto Desconocido'}</strong>
+                        </div>
+                        <div className="tarjeta-body-articulo">
+                            <p><span>Cantidad:</span> {d.cantidad} u.</p>
+                            <p><span>Precio Unid:</span> S/. {(d.precioUnitario || 0).toFixed(2)}</p>
+                            <p className="tarjeta-subtotal"><span>Subtotal:</span> S/. {(d.subtotal || 0).toFixed(2)}</p>
+                        </div>
                     </div>
-                    
-                    <div className="table-wrapper">
-                        <h3>
-                            {ventaSeleccionada 
-                                ? `Artículos de la Venta #${String(ventaSeleccionada.id).padStart(3, '0')}` 
-                                : "Seleccione una venta para ver sus artículos"}
-                        </h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nombre del Producto</th>
-                                    <th>Cantidad Vendida</th>
-                                    <th>Precio Unitario</th>
-                                    <th>Sub Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {!ventaSeleccionada ? (
-                                    <tr>
-                                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#7f8c8d' }}>
-                                            Ninguna venta seleccionada en la tabla superior.
-                                        </td>
-                                    </tr>
-                                ) : !ventaSeleccionada.detalles || ventaSeleccionada.detalles.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} style={{ textAlign: 'center', padding: '15px', color: '#e74c3c' }}>
-                                            Esta venta no contains artículos en el sistema.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    ventaSeleccionada.detalles.map((d, index) => (
-                                        <tr key={d.id || index}>
-                                            <td>{d.producto?.nombre || `Producto ID: ${d.producto?.id || 'Desconocido'}`}</td>
-                                            <td>{d.cantidad} u.</td>
-                                            <td>S/. {(d.precioUnitario || 0).toFixed(2)}</td>
-                                            <td style={{ fontWeight: 'bold' }}>S/. {(d.subtotal || 0).toFixed(2)}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </main>
+                ))
+            )}
+        </div>
+    </div>
+</main>
             </div>
 
             {/* ================= MODAL DE REGISTRO DE VENTA ================= */}

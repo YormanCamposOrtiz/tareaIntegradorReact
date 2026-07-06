@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search, Trash2, UserPlus, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Para que el botón de Crear funcione
+import { useNavigate } from "react-router-dom"; 
 
 import api from "../../api";
 
@@ -11,8 +11,6 @@ export function DashboardUsuarios() {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState<any[]>([]);
   const [filtro, setFiltro] = useState("");
-  
-  // CORRECCIÓN 1: El estado inicial debe ser "TODOS" para que muestre datos al entrar
   const [rolFiltro, setRolFiltro] = useState("TODOS");
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +21,6 @@ export function DashboardUsuarios() {
   const cargarUsuarios = async () => {
     try {
       setLoading(true);
-      // Asegúrate de que la URL coincida con tu Backend
       const res = await api.get("/auth/usuarios");
       setUsuarios(res.data);
     } catch (error) {
@@ -55,7 +52,6 @@ export function DashboardUsuarios() {
     }
   };
 
-  // CORRECCIÓN 2: Lógica de filtrado con RETURN explícito
   const usuariosFiltrados = usuarios.filter(u => {
     const coincideTexto = 
       u.nombre.toLowerCase().includes(filtro.toLowerCase()) || 
@@ -63,50 +59,50 @@ export function DashboardUsuarios() {
     
     const coincideRol = rolFiltro === "TODOS" || u.rol === rolFiltro;
 
-    return coincideTexto && coincideRol; // Esto devuelve el resultado al array
+    return coincideTexto && coincideRol;
   });
 
   return (
-        
-
-    
     <div className="dashboard-container">
-
       <DashboardHeader />
 
-    <div className="dashboard-container2">
-      <div className="dashboard-header">
-        <h1>Gestión de Usuarios</h1>
-        
-        <div className="toolbar">
-          <div className="search-container">
-            <Search className="input-icon" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre o correo..." 
-              className="search-input"
-              onChange={(e) => setFiltro(e.target.value)}
-            />
+      <div className="dashboard-container2">
+        <div className="dashboard-header">
+          <h1>Gestión de Usuarios</h1>
+          
+          <div className="toolbar">
+            <div className="search-container">
+              <Search className="input-icon" size={18} />
+              <input 
+                type="text" 
+                placeholder="Buscar por nombre o correo..." 
+                className="search-input"
+                onChange={(e) => setFiltro(e.target.value)}
+              />
+            </div>
+            <select 
+              className="filter-select"
+              value={rolFiltro}
+              onChange={(e) => setRolFiltro(e.target.value)}
+            >
+              <option value="TODOS">Todos los Roles</option>
+              <option value="ADMINISTRADOR">Administradores</option>
+              <option value="Usuario">Usuarios</option>
+            </select>
           </div>
-          <select 
-            className="filter-select"
-            value={rolFiltro}
-            onChange={(e) => setRolFiltro(e.target.value)}
-          >
-            <option value="TODOS">Todos los Roles</option>
-            <option value="ADMINISTRADOR">Administradores</option>
-            <option value="Usuario">Usuarios</option>
-          </select>
         </div>
-      </div>
-      <div className="side-panel">
+
+        <div className="side-panel">
           <h4>Acciones</h4>
-          <button className="btn-add-admin"
-            onClick={() => navigate("/DashboardRegistro")}>
-            <UserPlus size={18} />Crear Admin</button>
-        </div><br></br>
-      <div className="crud-card">
-        <div className="main-table-area">
+          <button className="btn-add-admin" onClick={() => navigate("/DashboardRegistro")}>
+            <UserPlus size={18} />Crear Admin
+          </button>
+        </div>
+        <br />
+
+        <div className="crud-card">
+          {/* ================= VISTA DE TABLA (ESCRITORIO) ================= */}
+          <div className="main-table-area desktop-only">
             <table className="custom-table">
               <thead>
                 <tr>
@@ -154,10 +150,57 @@ export function DashboardUsuarios() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* ================= VISTA DE TARJETAS (MÓVIL) ================= */}
+          <div className="mobile-cards-area mobile-only">
+            {usuariosFiltrados.length > 0 ? (
+              usuariosFiltrados.map((u) => (
+                <div key={u.id} className="user-responsive-card">
+                  <div className="card-row">
+                    <span className="card-label">Usuario:</span>
+                    <span className="card-value username-text">{u.nombre}</span>
+                  </div>
+                  
+                  <div className="card-row">
+                    <span className="card-label">Correo:</span>
+                    <span className="card-value code-text">{u.correo}</span>
+                  </div>
+                  
+                  <div className="card-row">
+                    <span className="card-label">Rol Actual:</span>
+                    <span className="card-value">
+                      <span className={`role-badge ${u.rol === 'ADMINISTRADOR' ? 'admin' : 'user'}`}>
+                        {u.rol}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="card-actions">
+                    <button 
+                      onClick={() => cambiarRol(u.id, u.rol)}
+                      className="btn-responsive-action edit-btn"
+                    >
+                      <Shield size={16} /> Cambiar Rol
+                    </button>
+                    <button 
+                      onClick={() => eliminarUsuario(u.id)}
+                      className="btn-responsive-action delete-btn"
+                    >
+                      <Trash2 size={16} /> Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="no-results-mobile">
+                No se encontraron usuarios con esos criterios.
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     </div>
-    </div>
-      
   );
 }
