@@ -171,13 +171,13 @@ export function DashboardProductos() {
 
     // Borrado Lógico (Alternar visibilidad)
     const handleDelete = async (id) => {
-        if (!window.confirm("¿Cambiar el estado de visibilidad de este producto?")) return;
+        if (!window.confirm("¿Deseas eliminar este producto?")) return;
         try {
             await api.patch(`/productos/${id}/visibilidad`);
             fetchDatos();
             alert("Estado actualizado");
         } catch (error) {
-            alert("No se pudo actualizar la visibilidad");
+            alert("No se pudo eliminar el producto. Comprueba tus permisos.");
         }
     };
 
@@ -214,8 +214,7 @@ export function DashboardProductos() {
 
             <main className="productos-full-content">
 
-                <div className="table-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-
+                <div className="table-toolbar">
                     <div className="search-container">
                         <input
                             type="text"
@@ -225,11 +224,11 @@ export function DashboardProductos() {
                             className="input-search"
                         />
                     </div>
-                    <div>
-                        <button onClick={handleExportarExcel} className="btn-confirm" style={{ marginRight: '0.5rem' }}>
+                    <div className="toolbar-actions-group">
+                        <button onClick={handleExportarExcel} className="btn-confirm">
                             Exportar Excel
                         </button>
-                        <button onClick={() => descargarReportePdf('/productos/exportar-pdf', 'Inventario.pdf')} className="btn-confirm" style={{ marginRight: '0.5rem' }}>
+                        <button onClick={() => descargarReportePdf('/productos/exportar-pdf', 'Inventario.pdf')} className="btn-confirm">
                             Exportar a PDF
                         </button>
                         <button className="btn-confirm" onClick={() => openModal()}>
@@ -238,7 +237,8 @@ export function DashboardProductos() {
                     </div>
                 </div>
 
-                <div className="table-wrapper">
+                {/* VISTA DE TABLA: Se oculta automáticamente en móviles mediante CSS */}
+                <div className="table-wrapper tabla-escritorio">
                     <table>
                         <thead>
                             <tr>
@@ -264,7 +264,11 @@ export function DashboardProductos() {
                                         {prod.nombre}
                                         {!prod.visibilidad && <span className="badge-oculto"> (Oculto)</span>}
                                     </td>
-                                    <td>{prod.categoria?.emoji} {prod.categoria?.nombre}</td>
+                                    <td>
+                                        <span className="cat-tag">
+                                            {prod.categoria?.emoji} {prod.categoria?.nombre}
+                                        </span>
+                                    </td>
                                     <td className={prod.stock <= prod.stockMin ? "low-stock" : ""}>
                                         {prod.stock} / <small>{prod.stockMin}</small>
                                     </td>
@@ -280,9 +284,60 @@ export function DashboardProductos() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* VISTA DE TARJETAS: Se activa automáticamente en móviles mediante CSS */}
+                <div className="tarjetas-productos-movil">
+                    {productos.map((prod) => (
+                        <div 
+                            key={prod.id} 
+                            className="tarjeta-prod-item" 
+                            style={{ opacity: prod.visibilidad ? 1 : 0.5 }}
+                        >
+                            <div className="tarjeta-prod-header">
+                                <img 
+                                    src={prod.imagen || 'https://via.placeholder.com/50'} 
+                                    alt={prod.nombre} 
+                                    className="tarjeta-prod-img" 
+                                />
+                                <div className="tarjeta-prod-detalles-principales">
+                                    <h4 className="text-bold">
+                                        {prod.nombre}
+                                        {!prod.visibilidad && <span className="badge-oculto" style={{fontSize: '12px', color: '#78716c'}}> (Oculto)</span>}
+                                    </h4>
+                                    <span className="cat-tag">
+                                        {prod.categoria?.emoji} {prod.categoria?.nombre}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="tarjeta-prod-body">
+                                <div className="tarjeta-prod-fila">
+                                    <span className="text-muted">Stock / Mínimo:</span>
+                                    <span className={prod.stock <= prod.stockMin ? "low-stock" : "text-bold"}>
+                                        {prod.stock} / <small style={{color: '#78716c'}}>{prod.stockMin}</small> {prod.stock <= prod.stockMin && '⚠️'}
+                                    </span>
+                                </div>
+                                <div className="tarjeta-prod-fila">
+                                    <span className="text-muted">Precio Venta:</span>
+                                    <span className="text-price">s/{prod.precio_venta}</span>
+                                </div>
+                            </div>
+
+                            <div className="tarjeta-prod-actions">
+                                <button onClick={() => openModal(prod)} className="btn-icon-edit flex-grow-btn">
+                                    <Edit size={16} /> Editar
+                                </button>
+                                <button onClick={() => handleDelete(prod.id)} className="btn-icon-delete flex-grow-btn">
+                                    {prod.visibilidad ? <Trash2 size={16} /> : <Eye size={16} />} Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
             </main>
 
-            {/* MODAL */}
+            {/* MODAL (Se mantiene intacto) */}
             {isModalOpen && (
                 <div
                     className="modal-overlay"
