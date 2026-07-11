@@ -126,6 +126,12 @@ button.btn-cerrar:hover,
     border-color: #b91c1c !important;
     box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
 }
+
+/* Por defecto, las tarjetas están ocultas en PC */
+.tarjetas-movil {
+  display: none;
+}
+
 /* ==========================================
    TABLET
 ========================================== */
@@ -156,98 +162,173 @@ button.btn-cerrar:hover,
 }
 
 /* ==========================================
-   CELULAR
+   CELULAR 
 ========================================== */
-@media (max-width: 768px){
-
-  .ventas-container{
+@media (max-width: 768px) {
+  .ventas-container {
     height: auto;
     min-height: 100vh;
     overflow: visible;
   }
 
-  .ventas-content{
+  .ventas-content {
     flex-direction: column;
     gap: 15px;
     padding: 10px;
   }
 
-  .ventas-sidebar{
+  .ventas-sidebar {
     width: 100%;
     padding: 15px;
     border-radius: 16px;
+    box-sizing: border-box;
   }
 
-  .ventas-sidebar button{
+  .ventas-sidebar button {
     width: 100%;
   }
 
-  .filter-group input{
+  .filter-group input {
     width: 100%;
     box-sizing: border-box;
   }
 
-  .table-wrapper{
-    padding: 10px;
+  .table-wrapper {
+    padding: 15px;
     border-radius: 16px;
-    overflow-x: auto;
+    overflow: visible; /* Ya no necesita scroll horizontal la envoltura */
   }
 
-  table{
-    min-width: 700px;
+  /* 1. OCULTAMOS LA TABLA TRADICIONAL EN MÓVIL */
+  .tabla-escritorio {
+    display: none;
   }
 
-  thead th{
+  /* 2. ACTIVAMOS LAS TARJETAS EN MÓVIL */
+  .tarjetas-movil {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  /* --- DISEÑO DE TARJETA DEL HISTORIAL --- */
+  .tarjeta-venta {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left; /* Alineación natural de lectura */
+  }
+
+  .tarjeta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tarjeta-id {
+    font-weight: bold;
+    color: #475569;
+  }
+
+  .tarjeta-total {
+    font-weight: 800;
+    color: #27ae60;
+    font-size: 15px;
+  }
+
+  .tarjeta-body p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: #334155;
+  }
+
+  /* Estado cuando tocas una tarjeta para seleccionarla */
+  .tarjeta-seleccionada {
+    background: #ebf5fb;
+    border-color: #3498db;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+  }
+
+  /* --- DISEÑO DE TARJETA DE LOS DETALLES --- */
+  .tarjeta-articulo {
+    background: #fff;
+    border: 1.5px solid #f97316; /* Mantiene el color naranja de tu temática */
+    border-radius: 16px;
     padding: 12px;
+    text-align: left;
+  }
+
+  .tarjeta-header-articulo {
+    color: #f97316;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed #fed7aa;
+    padding-bottom: 4px;
+  }
+
+  .tarjeta-body-articulo p {
+    display: flex;
+    justify-content: space-between; /* Pone el texto a la izquierda y el valor a la derecha */
+    margin: 4px 0;
     font-size: 13px;
   }
 
-  tbody td{
-    padding: 10px;
-    font-size: 13px;
+  .tarjeta-body-articulo span {
+    color: #64748b;
   }
 
+  .tarjeta-subtotal {
+    font-weight: bold;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 4px;
+    margin-top: 6px !important;
+  }
+
+  .no-data, .no-data-select, .no-data-error {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 13px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
 }
 
 /* ==========================================
-   CELULARES PEQUEÑOS
+   CELULARES PEQUEÑOS (max-width: 480px) - REEMPLAZADO
 ========================================== */
-@media (max-width: 480px){
-
-  .ventas-content{
+@media (max-width: 480px) {
+  .ventas-content {
     padding: 8px;
   }
 
-  .ventas-sidebar{
+  .ventas-sidebar {
     padding: 12px;
   }
 
-  .ventas-sidebar button{
+  .ventas-sidebar button {
     padding: 12px;
     font-size: 14px;
   }
 
-  .filter-group input{
+  .filter-group input {
     padding: 10px;
     font-size: 14px;
   }
 
-  .table-wrapper{
+  .table-wrapper {
     padding: 8px;
   }
 
-  thead th{
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  tbody td{
-    font-size: 12px;
-    padding: 8px;
-  }
-
-  .btn-cerrar{
+  .btn-cerrar {
     width: 100%;
   }
-
 }

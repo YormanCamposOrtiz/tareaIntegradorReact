@@ -302,7 +302,7 @@ const handleExportarExcel = async () => {
         p.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
 
-    return (
+ return (
         <div className="compras-container">
             <DashboardHeader />
 
@@ -355,10 +355,12 @@ const handleExportarExcel = async () => {
                 </aside>
 
                 <main className="compras-main">
-                    {/* TABLA PRINCIPAL: HISTORIAL DE COMPRAS */}
+                    {/* ================= TABLA 1: HISTORIAL DE COMPRAS ================= */}
                     <div className="table-wrapper">
                         <h3>Historial de Órdenes de Compra</h3>
-                        <table>
+                        
+                        {/* Vista de Tabla Tradicional (Visible en Escritorio) */}
+                        <table className="tabla-escritorio">
                             <thead>
                                 <tr>
                                     <th>ID_Compra</th>
@@ -400,16 +402,46 @@ const handleExportarExcel = async () => {
                                 )}
                             </tbody>
                         </table>
+
+                        {/* Vista de Tarjetas Optimizada para Móvil */}
+                        <div className="tarjetas-movil">
+                            {compras.length === 0 ? (
+                                <div className="no-data">No hay compras registradas en el sistema.</div>
+                            ) : (
+                                compras.map(c => {
+                                    const isSelected = compraSeleccionada?.id === c.id;
+                                    return (
+                                        <div 
+                                            key={c.id}
+                                            className={`tarjeta-compra ${isSelected ? 'tarjeta-seleccionada' : ''}`}
+                                            onClick={() => setCompraSeleccionada(c)}
+                                        >
+                                            <div className="tarjeta-header">
+                                                <span className="tarjeta-id">ID: #{String(c.id).padStart(3, '0')}</span>
+                                                <span className="tarjeta-total-compra">S/. {(c.total || 0).toFixed(2)}</span>
+                                            </div>
+                                            <div className="tarjeta-body">
+                                                <p><strong>Proveedor:</strong> {c.proveedor}</p>
+                                                <p><strong>Recibido por:</strong> {c.usuario?.nombre || c.usuario?.username || 'Administrador'}</p>
+                                                <p><strong>Fecha:</strong> {c.fecha ? new Date(c.fecha).toLocaleString() : 'Fecha no registrada'}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
                     </div>
                     
-                    {/* TABLA INFERIOR: DETALLES DE LA COMPRA SELECCIONADA */}
+                    {/* ================= TABLA 2: DETALLES DE ARTÍCULOS ================= */}
                     <div className="table-wrapper" style={{ marginTop: '20px' }}>
                         <h3>
                             {compraSeleccionada 
                                 ? `Artículos de la Orden de Compra #${String(compraSeleccionada.id).padStart(3, '0')}` 
                                 : "Seleccione una orden de compra para ver sus artículos"}
                         </h3>
-                        <table>
+
+                        {/* Vista de Tabla Tradicional (Visible en Escritorio) */}
+                        <table className="tabla-escritorio">
                             <thead>
                                 <tr>
                                     <th>Nombre del Producto</th>
@@ -443,6 +475,28 @@ const handleExportarExcel = async () => {
                                 )}
                             </tbody>
                         </table>
+
+                        {/* Vista de Tarjetas de Detalles Optimizada para Móvil */}
+                        <div className="tarjetas-movil">
+                            {!compraSeleccionada ? (
+                                <div className="no-data-select">Ninguna orden de compra seleccionada en la tabla superior.</div>
+                            ) : !compraSeleccionada.detalles || compraSeleccionada.detalles.length === 0 ? (
+                                <div className="no-data-error">Esta compra no contiene desglose de artículos en el sistema.</div>
+                            ) : (
+                                compraSeleccionada.detalles.map((d, index) => (
+                                    <div key={d.id || index} className="tarjeta-articulo">
+                                        <div className="tarjeta-header-articulo">
+                                            {d.producto?.nombre || `Producto ID: ${d.producto?.id}`}
+                                        </div>
+                                        <div className="tarjeta-body-articulo">
+                                            <p><span>Cantidad:</span> <strong>{d.cantidad} u.</strong></p>
+                                            <p><span>Costo Unitario:</span> <strong>S/. {(d.precioCompra || 0).toFixed(2)}</strong></p>
+                                            <p className="tarjeta-subtotal"><span>Subtotal:</span> <strong>S/. {(d.subtotal || 0).toFixed(2)}</strong></p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </main>
             </div>
@@ -523,10 +577,10 @@ const handleExportarExcel = async () => {
                                                 <td>
                                                     <input 
                                                         type="number" 
+                                                        value={item.precioCosto || ''} 
                                                         step="0.01"
                                                         min="0"
                                                         placeholder="0.00"
-                                                        value={item.precioCosto || ''} 
                                                         onChange={(e) => cambiarPrecioCosto(item.id, parseFloat(e.target.value) || 0)}
                                                         style={{ width: '85px', padding: '5px', textAlign: 'right', borderRadius: '4px', border: '1px solid #bdc3c7' }}
                                                     />
