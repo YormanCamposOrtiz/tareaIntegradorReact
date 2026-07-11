@@ -34,7 +34,7 @@ function App() {
         <Route path="/perfil/mispedidos" element={<MisPedidos />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar" element={<RecuperarPassword />} />
-
+        
         <Route path="/DashboardHome" element={<DashboardHome />} />
         <Route path="/DashboardVentas" element={<DashboardVentas />} />
         <Route path="/DashboardCompras" element={<DashboardCompras />} />
