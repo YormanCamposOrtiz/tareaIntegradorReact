@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Verifica que sea react-router-dom
-import { Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom"; // Verifica que sea react-router-dom
 import { Lock, User, Heart, Eye, EyeOff, Home , Shield } from "lucide-react";
 
 import { Footer } from './fragments/Footer';
-
 import api from "../../api"; // Tu configuración de axios
 
 import "../static/Login.css";
@@ -16,23 +14,36 @@ export function Login() {
   const [credentials, setCredentials] = useState({ correo: "", contrasena: "" });
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); 
 
     try {
       const { correo, contrasena } = credentials; 
       
-      // Petición al backend
       const response = await api.post('/auth/login', { correo, contrasena });
       const user = response.data;
 
-      // Si el login es exitoso
-      if (user.success) {
-        // --- GUARDAR EN LOCALSTORAGE ---
-        localStorage.setItem("userEmail", correo); //
-        localStorage.setItem("userRole", user.rol); //
+      console.log("CONSOLA DEPURACIÓN - Respuesta del backend:", user);
 
+      if (user.success) {
+        // Guardar datos
+        localStorage.setItem("userEmail", correo);
+        localStorage.setItem("userRole", user.rol);
+        
+        // === GUARDAR TOKEN JWT ===
+        if (user.token) {
+          localStorage.setItem("token", user.token);
+          console.log("✅ Token JWT guardado correctamente");
+        }
+
+        // Guardar ID
+        if (user.id) {
+          localStorage.setItem("userId", user.id.toString());
+          console.log("✅ ID de usuario guardado:", user.id);
+        }
+
+        // Redirección según rol
         if (user.rol === 'ADMINISTRADOR') {
           navigate('/dashboardHome');
         } else {
@@ -49,7 +60,7 @@ export function Login() {
         alert("No se pudo conectar con el servidor.");
       }
     }
-  };
+};
 
 return (
     <div className="login-page-wrapper">
@@ -81,7 +92,6 @@ return (
 
           {/* 2. TÍTULOS (MediExpress y Panel) */}
           <h1>MediExpress</h1>
-          <p className="login-subtitle">Panel de Administración</p>
 
           <form onSubmit={handleSubmit} className="space-y-1">
             
@@ -103,31 +113,31 @@ return (
             </div>
 
             {/* 4. CAMPO CONTRASEÑA */}
-<div>
-  <label className="login-label">Contraseña</label>
-  <div className="input-group relative"> {/* Añadimos relative para posicionar el ojo */}
-    <input
-      type={showPassword ? "text" : "password"} // <--- CAMBIO DINÁMICO
-      className="login-input pr-10" // pr-10 para que el texto no tape el ojo
-      placeholder="Ingresa tu contraseña"
-      value={credentials.contrasena}
-      onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })}
-      required
-    />
-    
-    {/* Icono de Candado (Izquierda) */}
-    <Lock className="input-icon" />
+            <div>
+              <label className="login-label">Contraseña</label>
+              <div className="input-group relative"> {/* Añadimos relative para posicionar el ojo */}
+                <input
+                  type={showPassword ? "text" : "password"} // <--- CAMBIO DINÁMICO
+                  className="login-input pr-10" // pr-10 para que el texto no tape el ojo
+                  placeholder="Ingresa tu contraseña"
+                  value={credentials.contrasena}
+                  onChange={(e) => setCredentials({ ...credentials, contrasena: e.target.value })}
+                  required
+                />
+                
+                {/* Icono de Candado (Izquierda) */}
+                <Lock className="input-icon" />
 
-    {/* BOTÓN DEL OJITO (Derecha) */}
-    <button
-      type="button"
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
-      onClick={() => setShowPassword(!showPassword)}
-    >
-      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-    </button>
-  </div>
-</div>
+                {/* BOTÓN DEL OJITO (Derecha) */}
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
 
             <br></br>
             <div className="mt-2 text-sm text-gray-600">

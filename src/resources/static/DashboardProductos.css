@@ -471,7 +471,7 @@ tbody tr:last-child td {
 @media (max-width: 600px) {
 
   .productos-container {
-    padding: 16px;
+    padding: 0px;
   }
 
   .btn-nuevo-header {
@@ -485,5 +485,324 @@ tbody tr:last-child td {
 
   .modal-form {
     padding: 22px;
+  }
+}
+/* ==========================================
+   RESPONSIVE MEJORADO TABLET
+========================================== */
+@media (max-width: 900px) {
+
+  .productos-full-content{
+    padding: 15px;
+  }
+
+  .table-toolbar{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-container{
+    width: 100%;
+  }
+
+  .input-search{
+    width: 100%;
+  }
+
+  .btn-nuevo-header,
+  .btn-confirm{
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-row{
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrapper{
+    overflow-x: auto;
+  }
+
+  table{
+    min-width: 800px;
+  }
+
+  .modal-box{
+    width: 95%;
+    max-width: 95%;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE CELULAR
+========================================== */
+@media (max-width: 480px) {
+
+  .productos-full-content{
+    padding: 10px;
+  }
+
+  .table-toolbar{
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-overlay{
+    padding: 10px;
+  }
+
+  .modal-box{
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+  }
+
+  .modal-header{
+    padding: 15px;
+  }
+
+  .modal-header h3{
+    font-size: 18px;
+  }
+
+  .modal-form{
+    padding: 15px;
+  }
+
+  .form-group input,
+  .form-group select{
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .modal-actions{
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-confirm{
+    width: 100%;
+  }
+
+  .actions-cell{
+    gap: 6px;
+  }
+
+  .btn-icon-edit,
+  .btn-icon-delete{
+    width: 34px;
+    height: 34px;
+  }
+
+  .img-tabla-mini{
+    width: 40px;
+    height: 40px;
+  }
+}
+/* ==========================================
+   NUEVOS ESTILOS PARA TARJETAS MÓVILES
+========================================== */
+
+/* Por defecto, la vista móvil está oculta en escritorio */
+.tarjetas-productos-movil {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.tarjeta-prod-item {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--gray-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s ease;
+}
+
+.tarjeta-prod-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px dashed #e5e7eb;
+  padding-bottom: 12px;
+}
+
+.tarjeta-prod-img {
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.tarjeta-prod-detalles-principales {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.tarjeta-prod-detalles-principales h4 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.tarjeta-prod-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.tarjeta-prod-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.tarjeta-prod-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Botones expandibles adaptados para interacción táctil en móvil */
+.flex-grow-btn {
+  flex: 1;
+  height: 42px !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.badge-oculto {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* Ajuste fino para ordenar los botones de arriba en tablet/móvil */
+.toolbar-actions-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* ==========================================
+   REGLAS RESPONSIVAS INTERGRADAS 
+========================================== */
+
+@media (max-width: 768px) {
+  /* Ocultamos por completo el envoltorio de la tabla tradicional */
+  .tabla-escritorio {
+    display: none !important;
+  }
+
+  /* Activamos el contenedor de tarjetas Flexbox */
+  .tarjetas-productos-movil {
+    display: flex !important;
+  }
+
+  /* Distribución de la barra de búsqueda y botones superiores */
+  .table-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+
+  .toolbar-actions-group .btn-confirm {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-actions-group {
+    flex-direction: column;
+  }
+  
+  .toolbar-actions-group .btn-confirm {
+    width: 100%;
+  }
+}
+/* ==========================================
+   CORRECCIÓN DE ALINEACIÓN EN ESCRITORIO
+========================================== */
+
+/* Asegura el comportamiento original en pantallas grandes */
+.table-toolbar {
+  display: flex;
+  justify-content: space-between; /* Envía el buscador a la izquierda y los botones a la derecha */
+  align-items: center;            /* Los alinea perfectamente en el eje vertical */
+  margin-bottom: 22px;
+  width: 100%;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px; /* Evita que el buscador se estire infinitamente */
+}
+
+.input-search {
+  width: 100%;
+  height: 48px; /* O el tamaño de altura que uses en tus inputs */
+}
+
+/* Contenedor de botones en escritorio */
+.toolbar-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;       /* Separación uniforme entre los 3 botones */
+  width: auto;     /* Evita que ocupe todo el ancho en escritorio */
+}
+
+.toolbar-actions-group .btn-confirm {
+  width: auto;     /* Conserva el tamaño propio de cada botón basado en su texto */
+  white-space: nowrap; 
+}
+
+
+/* ==========================================
+   ADAPTACIÓN EXCLUSIVA PARA MÓVILES (BREAKPOINTS)
+========================================== */
+
+@media (max-width: 900px) {
+  .table-toolbar {
+    flex-direction: column !important; /* Se apilan en tablet/móvil */
+    align-items: stretch !important;
+    gap: 14px;
+  }
+
+  .search-container {
+    max-width: 100%; /* En móviles sí ocupa todo el ancho */
+  }
+
+  .toolbar-actions-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Distribución limpia en pantallas medianas */
+    gap: 10px;
+  }
+  
+  .toolbar-actions-group .btn-confirm {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-actions-group {
+    display: flex;
+    flex-direction: column; /* Apilados verticalmente en celulares pequeños */
   }
 }
