@@ -89,21 +89,32 @@ const fetchDatos = async (desde?: string, hasta?: string) => {
         }
 
         const ventasResponse = await api.get(url);
-        const ventasData = Array.isArray(ventasResponse.data) 
-            ? ventasResponse.data 
-            : (ventasResponse.data?.content || []);
+
+        // El backend devuelve un array directo, no paginado
+        const ventasData = Array.isArray(ventasResponse.data)
+            ? ventasResponse.data
+            : [];
 
         setVentas(ventasData);
         setVentaSeleccionada(null);
+
     } catch (error: any) {
-        console.error("❌ Error al cargar datos de Ventas:", error);
-        
-        // MEJORADO: No redirigir inmediatamente en dashboards
-        if (error.response?.status === 401 || error.response?.status === 403) {
-            console.warn("⚠️ Problema de autenticación en dashboard");
-            // Opcional: alert solo si realmente es token inválido
-            // alert("Sesión expirada. Por favor inicia sesión nuevamente.");
+        console.error("Error al cargar datos de Ventas:", error);
+
+        const status = error.response?.status;
+        const mensaje = error.response?.data?.message
+            || error.response?.data?.detail
+            || "No se pudieron cargar las ventas. Verifique que Spring Boot esté corriendo.";
+
+        if (status === 500) {
+            alert("Error del servidor al cargar ventas (500). Revise la consola de Spring Boot.");
+        } else if (status === 401 || status === 403) {
+            alert("Sesión expirada o sin permisos. Inicie sesión nuevamente.");
+        } else {
+            alert(mensaje);
         }
+
+        setVentas([]);
     }
 };
     const agregarAlCarrito = (prod: Producto) => {
