@@ -12,6 +12,8 @@ import {
   LogOut 
 } from "lucide-react";
 
+import api from "../../api";
+
 import { DashboardHeader } from './fragments/DashboardHeader';
 
 //import { DashboardHeader } from './fragments/DashboardHeader';
@@ -20,44 +22,82 @@ import "../static/DashboardHome.css";
 export function DashboardHome() {
   const navigate = useNavigate();
   const [hora, setHora] = useState(new Date().toLocaleTimeString());
+  const [totalClientes, setTotalClientes] = useState(0);
+  const [totalProductosStockBajo, setTotalProductosStockBajo] = useState(0);
+  const [totalVentasHoy, setTotalVentasHoy] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => setHora(new Date().toLocaleTimeString()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // 2. Cantidad de clientes
+  useEffect(() => {
+    api.get("/perfil/total-clientes")
+      .then((response) => {
+        setTotalClientes(response.data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener clientes:", error);
+      });
+  }, []);
+
+  // 2. Cantidad de productos stock min
+  useEffect(() => {
+    api.get("/productos/stock-bajo")
+      .then((response) => {
+        setTotalProductosStockBajo(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  // 3. Ventas de hoy
+  useEffect(() => {
+      api.get("/ventas/ventas-hoy")
+          .then((response) => {
+              setTotalVentasHoy(response.data);
+          })
+          .catch((error) => {
+              console.error(error);
+          });
+  }, []);
+
   return (
+    <div className="admin-main-container">
 
-      <div className="admin-main-container">
+      <DashboardHeader />
+  
+      <main className="admin-content">
 
-        <DashboardHeader />
-    
-        <main className="admin-content">
- 
-          {/* INDICADORES RÁPIDOS (KPIs) */}
-          <section className="kpi-grid">
-            <div className="kpi-card">
-              <div className="kpi-icon blue"><ShoppingBag/></div>
-              <div className="kpi-data">
-                <span>Ventas Hoy</span>
-                <h3>S/ 1,250.00</h3>
-              </div>
+        {/* INDICADORES RÁPIDOS (KPIs) */}
+        <section className="kpi-grid">
+          <div className="kpi-card">
+            <div className="kpi-icon blue"><ShoppingBag/></div>
+            <div className="kpi-data">
+              <span>Ventas Hoy</span>
+              <h3>s/ {totalVentasHoy}</h3>
             </div>
-            <div className="kpi-card">
-              <div className="kpi-icon orange"><Package/></div>
-              <div className="kpi-data">
-                <span>Stock Bajo</span>
-                <h3>12 ítems</h3>
-              </div>
+          </div>
+          
+          <div className="kpi-card">
+            <div className="kpi-icon orange"><Package/></div>
+            <div className="kpi-data">
+              <span>Stock Bajo</span>
+              <h3>{totalProductosStockBajo}</h3>
             </div>
-            <div className="kpi-card">
-              <div className="kpi-icon green"><Users/></div>
-              <div className="kpi-data">
-                <span>Clientes</span>
-                <h3>842</h3>
-              </div>
+          </div>
+
+          {/* 3. Reemplazamos el valor estático por la variable del estado */}
+          <div className="kpi-card">
+            <div className="kpi-icon green"><Users/></div>
+            <div className="kpi-data">
+              <span>Clientes</span>
+              <h3>{totalClientes}</h3>
             </div>
-          </section>
+          </div>
+        </section>
 
           {/* GRILLA DE MÓDULOS PRINCIPALES */}
           <div className="module-grid">
