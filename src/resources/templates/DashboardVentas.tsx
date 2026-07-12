@@ -77,25 +77,35 @@ export function DashboardVentas() {
         fetchDatos();
     }, []);
 
-    const fetchDatos = async (desde?: string, hasta?: string) => {
-        try {
-            const prodResponse = await api.get('/productos');
-            setProductos(prodResponse.data);
-            
-            // Construcción dinámica de la URL con Query Params
-            let url = '/ventas';
-            if (desde && hasta) {
-                url += `?inicio=${desde}&fin=${hasta}`;
-            }
-            
-            const ventasResponse = await api.get(url);
-            setVentas(ventasResponse.data);
-            setVentaSeleccionada(null);
-        } catch (error) {
-            console.error("Error al cargar datos desde Spring Boot:", error);
-        }
-    };
+// Reemplaza tu fetchDatos por esta versión:
+const fetchDatos = async (desde?: string, hasta?: string) => {
+    try {
+        const prodResponse = await api.get('/productos');
+        setProductos(prodResponse.data);
 
+        let url = '/ventas';
+        if (desde && hasta) {
+            url += `?inicio=${desde}&fin=${hasta}`;
+        }
+
+        const ventasResponse = await api.get(url);
+        const ventasData = Array.isArray(ventasResponse.data) 
+            ? ventasResponse.data 
+            : (ventasResponse.data?.content || []);
+
+        setVentas(ventasData);
+        setVentaSeleccionada(null);
+    } catch (error: any) {
+        console.error("❌ Error al cargar datos de Ventas:", error);
+        
+        // MEJORADO: No redirigir inmediatamente en dashboards
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            console.warn("⚠️ Problema de autenticación en dashboard");
+            // Opcional: alert solo si realmente es token inválido
+            // alert("Sesión expirada. Por favor inicia sesión nuevamente.");
+        }
+    }
+};
     const agregarAlCarrito = (prod: Producto) => {
         const existe = carrito.find(item => item.id === prod.id);
         if (existe) {
@@ -206,7 +216,10 @@ export function DashboardVentas() {
 
             const ahora = new Date();
             const fechaFormateada = ahora.toISOString().split('.')[0]; 
-
+            const token = localStorage.getItem("token");
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
             const detallesVenta = carrito.map(item => ({
                 cantidad: item.cantidad,
                 precioUnitario: item.precioUnid,
@@ -225,7 +238,7 @@ export function DashboardVentas() {
                 detalles: detallesVenta 
             };
 
-            const response = await api.post('/ventas', nuevaVenta);
+            const response = await api.post('/ventas', nuevaVenta, config);
             
             if (response.status === 200 || response.status === 201) {
                 alert("¡Venta registrada con éxito en el sistema!");
@@ -245,31 +258,23 @@ export function DashboardVentas() {
     };
 
     const handleEliminarVenta = async () => {
-        if (!ventaSeleccionada) return;
+    if (!ventaSeleccionada) return;
 
-        const confirmar = window.confirm(
-            `¿Está completamente seguro de que desea ANULAR la venta #${String(ventaSeleccionada.id).padStart(3, '0')}?\n` +
-            `Esto devolverá los productos vendidos directamente al stock actual.`
-        );
+    const confirmar = window.confirm(`¿Estás seguro de anular la venta #${String(ventaSeleccionada.id).padStart(3, '0')}?`);
+    if (!confirmar) return;
 
-        if (!confirmar) return;
+    try {
+        const response = await api.delete(`/ventas/${ventaSeleccionada.id}`);
 
-        try {
-            const response = await api.delete(`/ventas/${ventaSeleccionada.id}`);
-            
-            if (response.status === 200) {
-                alert("¡Venta anulada correctamente! El inventario ha sido restablecido.");
-                fetchDatos(); 
-            }
-        } catch (err: any) {
-            console.error("Error al eliminar la venta:", err);
-            if (err.response && err.response.data) {
-                alert(`Error en el servidor: ${err.response.data.message || 'No se pudo anular la venta.'}`);
-            } else {
-                alert("Hubo un problema de conexión al intentar anular la venta.");
-            }
+        if (response.status === 200) {
+            alert("¡Venta anulada correctamente!");
+            fetchDatos();
         }
-    };
+    } catch (err: any) {
+        console.error(err);
+        alert(err.response?.data?.message || "No se pudo anular la venta.");
+    }
+};
 
     const handleBuscarPorFechas = () => {
         if (!fechaDesde || !fechaHasta) {

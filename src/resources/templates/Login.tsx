@@ -21,27 +21,29 @@ const handleSubmit = async (e: React.FormEvent) => {
     try {
       const { correo, contrasena } = credentials; 
       
-      // 1. Una sola petición al backend (Neon Tech a través de Spring Boot)
       const response = await api.post('/auth/login', { correo, contrasena });
       const user = response.data;
 
-      console.log("CONSOLA DEPURACIÓN - Esto es lo que responde mi backend:", user);
+      console.log("CONSOLA DEPURACIÓN - Respuesta del backend:", user);
 
-      // 2. Evaluamos la respuesta del objeto 'user'
       if (user.success) {
-        // Guardar datos en el localStorage del navegador
+        // Guardar datos
         localStorage.setItem("userEmail", correo);
         localStorage.setItem("userRole", user.rol);
         
-        // Guardamos el ID del usuario para usarlo en el Checkout
-        if (user.id) {
-          localStorage.setItem("userId", user.id.toString());
-          console.log("✅ ID de usuario guardado con éxito en localStorage:", user.id);
-        } else {
-          console.error("❌ Error: El backend sigue sin enviar el campo 'id'.");
+        // === GUARDAR TOKEN JWT ===
+        if (user.token) {
+          localStorage.setItem("token", user.token);
+          console.log("✅ Token JWT guardado correctamente");
         }
 
-        // 3. Redirección de roles
+        // Guardar ID
+        if (user.id) {
+          localStorage.setItem("userId", user.id.toString());
+          console.log("✅ ID de usuario guardado:", user.id);
+        }
+
+        // Redirección según rol
         if (user.rol === 'ADMINISTRADOR') {
           navigate('/dashboardHome');
         } else {
@@ -58,7 +60,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         alert("No se pudo conectar con el servidor.");
       }
     }
-  };
+};
 
 return (
     <div className="login-page-wrapper">
