@@ -77,86 +77,27 @@ export function DashboardVentas() {
         fetchDatos();
     }, []);
 
-// Reemplaza tu fetchDatos por esta versión:
-const fetchDatos = async (desde?: string, hasta?: string) => {
-    try {
-        const prodResponse = await api.get('/productos');
-        setProductos(prodResponse.data);
+    const fetchDatos = async (desde?: string, hasta?: string) => {
+        try {
+            const prodResponse = await api.get('/productos');
+            setProductos(prodResponse.data);
 
-        let url = '/ventas';
-        if (desde && hasta) {
-            url += `?inicio=${desde}&fin=${hasta}`;
-        }
+            let url = '/ventas';
+            const params: any = {};
 
-        const ventasResponse = await api.get(url);
-
-        // El backend devuelve un array directo, no paginado
-        const ventasData = Array.isArray(ventasResponse.data)
-            ? ventasResponse.data
-            : [];
-
-        setVentas(ventasData);
-        setVentaSeleccionada(null);
-
-    } catch (error: any) {
-        console.error("Error al cargar datos de Ventas:", error);
-
-        const status = error.response?.status;
-        const mensaje = error.response?.data?.message
-            || error.response?.data?.detail
-            || "No se pudieron cargar las ventas. Verifique que Spring Boot esté corriendo.";
-
-        if (status === 500) {
-            alert("Error del servidor al cargar ventas (500). Revise la consola de Spring Boot.");
-        } else if (status === 401 || status === 403) {
-            alert("Sesión expirada o sin permisos. Inicie sesión nuevamente.");
-        } else {
-            alert(mensaje);
-        }
-
-        setVentas([]);
-    }
-};
-    const agregarAlCarrito = (prod: Producto) => {
-        const existe = carrito.find(item => item.id === prod.id);
-        if (existe) {
-            if (existe.cantidad >= prod.stock) {
-                alert(`Stock máximo alcanzado para este producto (${prod.stock} u.)`);
-                return;
+            if (desde && hasta) {
+                params.inicio = desde;
+                params.fin = hasta;
             }
-            cambiarCantidad(prod.id, existe.cantidad + 1);
-        } else {
-            setCarrito([...carrito, {
-                id: prod.id,
-                nombre: prod.nombre,
-                cantidad: 1,
-                precioUnid: prod.precio_venta,
-                subTotal: prod.precio_venta
-            }]);
+
+            const ventasResponse = await api.get(url, { params });
+            setVentas(ventasResponse.data);
+            setVentaSeleccionada(null);
+        } catch (error) {
+            console.error("Error al cargar datos:", error);
         }
-        setBusqueda(''); 
     };
-
-    const cambiarCantidad = (id: number, nuevaCantidad: number) => {
-        const productoReal = productos.find(p => p.id === id);
-        
-        if (nuevaCantidad < 1) return; 
-        if (productoReal && nuevaCantidad > productoReal.stock) {
-            alert(`No puedes vender más de lo que hay en stock (${productoReal.stock} u. disponibles)`);
-            return;
-        }
-
-        setCarrito(carrito.map(item => 
-            item.id === id 
-                ? { ...item, cantidad: nuevaCantidad, subTotal: nuevaCantidad * item.precioUnid }
-                : item
-        ));
-    };
-
-    const eliminarDelCarrito = (id: number) => {
-        setCarrito(carrito.filter(item => item.id !== id));
-    };
-
+    
     // FUNCIÓN PARA DESCARGAR EL REPORTE EN PDF (CORREGIDA)
     const descargarReportePdf = async (endpoint: string, nombreArchivo: string) => {
         try {

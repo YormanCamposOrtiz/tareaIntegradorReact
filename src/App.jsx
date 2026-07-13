@@ -22,23 +22,22 @@ import { DashboardRegistro } from "./resources/templates/DashboardRegistro";
 // 🛡️ COMPONENTE INTERNO DE PROTECCIÓN (Todo en la misma pestaña)
 // ====================================================================
   const ProtectedRoute = ({ allowedRoles }) => {
-    const userJson = localStorage.getItem('user'); 
+    const userJson = localStorage.getItem('user');
     const user = userJson ? JSON.parse(userJson) : null;
 
-    // 1. Si no ha iniciado sesión, al login de inmediato
     if (!user) {
       return <Navigate to="/login" replace />;
     }
 
-    // 2. Si hay roles permitidos y el rol del usuario no está en la lista, al inicio
-    if (allowedRoles && !allowedRoles.includes(user.rol)) {
+    // Normalizar rol (por si viene en mayúsculas)
+    const userRole = user.rol?.toLowerCase();
+
+    if (allowedRoles && !allowedRoles.some(role => role.toLowerCase() === userRole)) {
       return <Navigate to="/" replace />;
     }
 
-    // 3. Si pasa los filtros, renderiza la ruta hija
     return <Outlet />;
   };
-
 // ====================================================================
 // 🚀 COMPONENTE PRINCIPAL
 // ====================================================================
@@ -61,7 +60,7 @@ function App() {
         </Route>
 
         {/* === RUTAS DEL DASHBOARD PROTEGIDAS POR ROL (Admin/Empleado) === */}
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'empleado']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'ADMINISTRADOR', 'empleado']} />}>
           <Route path="/DashboardHome" element={<DashboardHome />} />
           <Route path="/DashboardVentas" element={<DashboardVentas />} />
           <Route path="/DashboardCompras" element={<DashboardCompras />} />
