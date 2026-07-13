@@ -30,6 +30,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         // Guardar datos
         localStorage.setItem("userEmail", correo);
         localStorage.setItem("userRole", user.rol);
+        localStorage.setItem("user", JSON.stringify(user));
         
         // === GUARDAR TOKEN JWT ===
         if (user.token) {
@@ -44,8 +45,8 @@ const handleSubmit = async (e: React.FormEvent) => {
         }
 
         // Redirección según rol
-        if (user.rol === 'ADMINISTRADOR') {
-          navigate('/dashboardHome');
+        if (user.rol === 'ADMINISTRADOR'|| user.rol === 'admin') {
+          navigate('/DashboardHome');
         } else {
           navigate('/');
         }
